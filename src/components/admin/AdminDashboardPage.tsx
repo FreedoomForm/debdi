@@ -86,7 +86,6 @@ import {
   Truck,
   Database,
   Utensils,
-  CookingPot,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -96,7 +95,8 @@ import { TrialStatus } from '@/components/admin/TrialStatus'
 import { ChangePasswordModal } from '@/components/admin/ChangePasswordModal'
 import { SiteBuilderCard } from '@/components/admin/SiteBuilderCard'
 import { getDailyPrice, PLAN_TYPES } from '@/lib/menuData'
-import { CANONICAL_TABS, deriveVisibleTabs } from '@/components/admin/dashboard/tabs'
+import { CANONICAL_TABS, deriveVisibleTabs, type CanonicalTabId } from '@/components/admin/dashboard/tabs'
+import { DASHBOARD_TAB_META } from '@/components/admin/dashboard/tabMeta'
 import type { Client, Order } from '@/components/admin/dashboard/types'
 import { DesktopTabsNav } from '@/components/admin/dashboard/DesktopTabsNav'
 import { MobileBottomTabsNav } from '@/components/admin/dashboard/MobileBottomTabsNav'
@@ -266,6 +266,69 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
     finance: t.finance.title,
     interface: t.admin.interface,
   }
+  const ActiveTabWatermarkIcon = useMemo(() => {
+    if (activeTab in DASHBOARD_TAB_META) {
+      return DASHBOARD_TAB_META[activeTab as CanonicalTabId].icon
+    }
+    return DASHBOARD_TAB_META.statistics.icon
+  }, [activeTab])
+  const statsSubCopy = useMemo(() => {
+    if (language === 'ru') {
+      return {
+        delivered: 'Доставлено',
+        canceled: 'Отменено',
+        inProgress: 'В процессе',
+        inQueue: 'В очереди',
+        prepaid: 'Оплачено',
+        onDelivery: 'При получении',
+        online: 'Онлайн',
+        cash: 'Наличные',
+        everyDay: 'Каждый день',
+        evenDays: 'Четные дни',
+        oddDays: 'Нечетные дни',
+        special: 'С особенностями',
+        kcal: 'ккал',
+        onePortion: '1 порция',
+        manyPortions: '2+ порции',
+      }
+    }
+    if (language === 'uz') {
+      return {
+        delivered: 'Yetkazilgan',
+        canceled: 'Bekor qilingan',
+        inProgress: 'Jarayonda',
+        inQueue: 'Navbatda',
+        prepaid: "To'langan",
+        onDelivery: 'Qabulda tolanadi',
+        online: 'Onlayn',
+        cash: 'Naqd',
+        everyDay: 'Har kuni',
+        evenDays: 'Juft kunlar',
+        oddDays: 'Toq kunlar',
+        special: 'Maxsus ehtiyojli',
+        kcal: 'kkal',
+        onePortion: '1 porsiya',
+        manyPortions: '2+ porsiya',
+      }
+    }
+    return {
+      delivered: 'Delivered',
+      canceled: 'Canceled',
+      inProgress: 'In progress',
+      inQueue: 'In queue',
+      prepaid: 'Prepaid',
+      onDelivery: 'On delivery',
+      online: 'Online',
+      cash: 'Cash',
+      everyDay: 'Every day',
+      evenDays: 'Even days',
+      oddDays: 'Odd days',
+      special: 'Special needs',
+      kcal: 'kcal',
+      onePortion: '1 portion',
+      manyPortions: '2+ portions',
+    }
+  }, [language])
   const [courierFormData, setCourierFormData] = useState({
     name: '',
     email: '',
@@ -2564,22 +2627,21 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
                 transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                 className="absolute top-10 right-10 opacity-5 dark:opacity-10 pointer-events-none"
               >
-                <CookingPot className="w-64 h-64 text-gourmet-ink dark:text-dark-text" />
+                <ActiveTabWatermarkIcon className="w-64 h-64 text-gourmet-ink dark:text-dark-text" />
               </motion.div>
 
           {!isMiddleAdminView && (
             <>
               {/* Statistics Tab */}
               <TabsContent value="statistics" className="space-y-5 animate-fade-in">
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Order Status Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div>
               <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t.admin.stats.successful} / {t.admin.stats.failed}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { label: t.admin.stats.successful, value: stats?.successfulOrders || 0, sub: 'Ãâ€ÃÂ¾Ã‘ÂÃ‘â€šÃÂ°ÃÂ²ÃÂ»ÃÂµÃÂ½ÃÂ¾', color: 'text-emerald-600', dot: 'bg-emerald-500' },
-                  { label: t.admin.stats.failed, value: stats?.failedOrders || 0, sub: 'ÃÅ¾Ã‘â€šÃÂ¼ÃÂµÃÂ½ÃÂµÃÂ½ÃÂ¾', color: 'text-rose-600', dot: 'bg-rose-500' },
-                  { label: t.admin.stats.inDelivery, value: stats?.inDeliveryOrders || 0, sub: 'Ãâ€™ ÃÂ¿Ã‘â‚¬ÃÂ¾Ã‘â€ ÃÂµÃ‘ÂÃ‘ÂÃÂµ', color: 'text-blue-600', dot: 'bg-blue-500' },
-                  { label: t.admin.stats.pending, value: stats?.pendingOrders || 0, sub: 'Ãâ€™ ÃÂ¾Ã‘â€¡ÃÂµÃ‘â‚¬ÃÂµÃÂ´ÃÂ¸', color: 'text-amber-600', dot: 'bg-amber-500' },
+                  { label: t.admin.stats.successful, value: stats?.successfulOrders || 0, sub: statsSubCopy.delivered, color: 'text-emerald-600', dot: 'bg-emerald-500' },
+                  { label: t.admin.stats.failed, value: stats?.failedOrders || 0, sub: statsSubCopy.canceled, color: 'text-rose-600', dot: 'bg-rose-500' },
+                  { label: t.admin.stats.inDelivery, value: stats?.inDeliveryOrders || 0, sub: statsSubCopy.inProgress, color: 'text-blue-600', dot: 'bg-blue-500' },
+                  { label: t.admin.stats.pending, value: stats?.pendingOrders || 0, sub: statsSubCopy.inQueue, color: 'text-amber-600', dot: 'bg-amber-500' },
                 ].map((s) => (
                   <div key={s.label} className="rounded-base border-2 border-border bg-card p-4 shadow-shadow transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none">
                     <div className="flex items-center gap-2 mb-2">
@@ -2593,15 +2655,14 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
               </div>
             </div>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Payment Stats Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div>
               <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t.admin.stats.prepaid} / {t.admin.stats.unpaid}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { label: t.admin.stats.prepaid, value: stats?.prepaidOrders || 0, sub: 'ÃÅ¾ÃÂ¿ÃÂ»ÃÂ°Ã‘â€¡ÃÂµÃÂ½ÃÂ¾', color: 'text-emerald-600', dot: 'bg-emerald-500' },
-                  { label: t.admin.stats.unpaid, value: stats?.unpaidOrders || 0, sub: 'ÃÅ¸Ã‘â‚¬ÃÂ¸ ÃÂ¿ÃÂ¾ÃÂ»Ã‘Æ’Ã‘â€¡ÃÂµÃÂ½ÃÂ¸ÃÂ¸', color: 'text-rose-600', dot: 'bg-rose-500' },
-                  { label: t.admin.stats.card, value: stats?.cardOrders || 0, sub: 'ÃÅ¾ÃÂ½ÃÂ»ÃÂ°ÃÂ¹ÃÂ½', color: 'text-blue-600', dot: 'bg-blue-500' },
-                  { label: t.admin.stats.cash, value: stats?.cashOrders || 0, sub: 'ÃÂÃÂ°ÃÂ»ÃÂ¸Ã‘â€¡ÃÂ½Ã‘â€¹ÃÂµ', color: 'text-teal-600', dot: 'bg-teal-500' },
+                  { label: t.admin.stats.prepaid, value: stats?.prepaidOrders || 0, sub: statsSubCopy.prepaid, color: 'text-emerald-600', dot: 'bg-emerald-500' },
+                  { label: t.admin.stats.unpaid, value: stats?.unpaidOrders || 0, sub: statsSubCopy.onDelivery, color: 'text-rose-600', dot: 'bg-rose-500' },
+                  { label: t.admin.stats.card, value: stats?.cardOrders || 0, sub: statsSubCopy.online, color: 'text-blue-600', dot: 'bg-blue-500' },
+                  { label: t.admin.stats.cash, value: stats?.cashOrders || 0, sub: statsSubCopy.cash, color: 'text-teal-600', dot: 'bg-teal-500' },
                 ].map((s) => (
                   <div key={s.label} className="rounded-base border-2 border-border bg-card p-4 shadow-shadow transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none">
                     <div className="flex items-center gap-2 mb-2">
@@ -2615,15 +2676,14 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
               </div>
             </div>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Customer Stats Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div>
               <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t.admin.stats.daily}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { label: t.admin.stats.daily, value: stats?.dailyCustomers || 0, sub: 'ÃÅ¡ÃÂ°ÃÂ¶ÃÂ´Ã‘â€¹ÃÂ¹ ÃÂ´ÃÂµÃÂ½Ã‘Å’', color: 'text-violet-600', dot: 'bg-violet-500' },
-                  { label: t.admin.stats.evenDay, value: stats?.evenDayCustomers || 0, sub: 'ÃÂ§Ã‘â€˜Ã‘â€šÃÂ½Ã‘â€¹ÃÂµ ÃÂ´ÃÂ½ÃÂ¸', color: 'text-indigo-600', dot: 'bg-indigo-500' },
-                  { label: t.admin.stats.oddDay, value: stats?.oddDayCustomers || 0, sub: 'ÃÂÃÂµÃ‘â€¡Ã‘â€˜Ã‘â€šÃÂ½Ã‘â€¹ÃÂµ ÃÂ´ÃÂ½ÃÂ¸', color: 'text-pink-600', dot: 'bg-pink-500' },
-                  { label: t.admin.stats.special, value: stats?.specialPreferenceCustomers || 0, sub: 'ÃÂ¡ ÃÂ¾Ã‘ÂÃÂ¾ÃÂ±ÃÂµÃÂ½ÃÂ½ÃÂ¾Ã‘ÂÃ‘â€šÃ‘ÂÃÂ¼ÃÂ¸', color: 'text-orange-600', dot: 'bg-orange-500' },
+                  { label: t.admin.stats.daily, value: stats?.dailyCustomers || 0, sub: statsSubCopy.everyDay, color: 'text-violet-600', dot: 'bg-violet-500' },
+                  { label: t.admin.stats.evenDay, value: stats?.evenDayCustomers || 0, sub: statsSubCopy.evenDays, color: 'text-indigo-600', dot: 'bg-indigo-500' },
+                  { label: t.admin.stats.oddDay, value: stats?.oddDayCustomers || 0, sub: statsSubCopy.oddDays, color: 'text-pink-600', dot: 'bg-pink-500' },
+                  { label: t.admin.stats.special, value: stats?.specialPreferenceCustomers || 0, sub: statsSubCopy.special, color: 'text-orange-600', dot: 'bg-orange-500' },
                 ].map((s) => (
                   <div key={s.label} className="rounded-base border-2 border-border bg-card p-4 shadow-shadow transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none">
                     <div className="flex items-center gap-2 mb-2">
@@ -2637,16 +2697,15 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
               </div>
             </div>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Calories Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div>
               <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t.admin.stats.lowCal}</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 {[
-                  { label: t.admin.stats.lowCal, value: stats?.orders1200 || 0, sub: '1200 ÃÂºÃÂºÃÂ°ÃÂ»', color: 'text-rose-600', dot: 'bg-rose-500' },
-                  { label: t.admin.stats.standard, value: stats?.orders1600 || 0, sub: '1600 ÃÂºÃÂºÃÂ°ÃÂ»', color: 'text-orange-600', dot: 'bg-orange-500' },
-                  { label: t.admin.stats.medium, value: stats?.orders2000 || 0, sub: '2000 ÃÂºÃÂºÃÂ°ÃÂ»', color: 'text-yellow-600', dot: 'bg-yellow-500' },
-                  { label: t.admin.stats.high, value: stats?.orders2500 || 0, sub: '2500 ÃÂºÃÂºÃÂ°ÃÂ»', color: 'text-emerald-600', dot: 'bg-emerald-500' },
-                  { label: t.admin.stats.max, value: stats?.orders3000 || 0, sub: '3000 ÃÂºÃÂºÃÂ°ÃÂ»', color: 'text-blue-600', dot: 'bg-blue-500' },
+                  { label: t.admin.stats.lowCal, value: stats?.orders1200 || 0, sub: `1200 ${statsSubCopy.kcal}`, color: 'text-rose-600', dot: 'bg-rose-500' },
+                  { label: t.admin.stats.standard, value: stats?.orders1600 || 0, sub: `1600 ${statsSubCopy.kcal}`, color: 'text-orange-600', dot: 'bg-orange-500' },
+                  { label: t.admin.stats.medium, value: stats?.orders2000 || 0, sub: `2000 ${statsSubCopy.kcal}`, color: 'text-yellow-600', dot: 'bg-yellow-500' },
+                  { label: t.admin.stats.high, value: stats?.orders2500 || 0, sub: `2500 ${statsSubCopy.kcal}`, color: 'text-emerald-600', dot: 'bg-emerald-500' },
+                  { label: t.admin.stats.max, value: stats?.orders3000 || 0, sub: `3000 ${statsSubCopy.kcal}`, color: 'text-blue-600', dot: 'bg-blue-500' },
                 ].map((s) => (
                   <div key={s.label} className="rounded-base border-2 border-border bg-card p-4 shadow-shadow transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none">
                     <div className="flex items-center gap-2 mb-2">
@@ -2660,11 +2719,10 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
               </div>
             </div>
 
-            {/* Ã¢â€â‚¬Ã¢â€â‚¬ Item Count Ã¢â€â‚¬Ã¢â€â‚¬ */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: t.admin.stats.single, value: stats?.singleItemOrders || 0, sub: '1 ÃÂ¿ÃÂ¾Ã‘â‚¬Ã‘â€ ÃÂ¸Ã‘Â', color: 'text-indigo-600', dot: 'bg-indigo-500' },
-                { label: t.admin.stats.multi, value: stats?.multiItemOrders || 0, sub: 'Ãâ€ÃÂ²ÃÂ° ÃÂ¸ ÃÂ±ÃÂ¾ÃÂ»ÃÂµÃÂµ Ã‘â‚¬ÃÂ°Ã‘â€ ÃÂ¸ÃÂ¾ÃÂ½ÃÂ¾ÃÂ²', color: 'text-violet-600', dot: 'bg-violet-500' },
+                { label: t.admin.stats.single, value: stats?.singleItemOrders || 0, sub: statsSubCopy.onePortion, color: 'text-indigo-600', dot: 'bg-indigo-500' },
+                { label: t.admin.stats.multi, value: stats?.multiItemOrders || 0, sub: statsSubCopy.manyPortions, color: 'text-violet-600', dot: 'bg-violet-500' },
               ].map((s) => (
                 <div key={s.label} className="rounded-base border-2 border-border bg-card p-4 shadow-shadow transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none">
                   <div className="flex items-center gap-2 mb-2">
@@ -4148,8 +4206,4 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
 }
 
 export default AdminDashboardPage
-
-
-
-
 
