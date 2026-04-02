@@ -706,13 +706,23 @@
   .badge-glow-rose    { border-color: hsl(0 65% 60% / 0.4);    }
 
   /* Section kicker */
-  .section-kicker { @apply text-overline; }
+  .section-kicker {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
 
   /* App shell */
   .app-shell { position: relative; isolation: isolate; }
 
   /* Section divider */
-  .section-divider { @apply divider-h; }
+  .section-divider {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
 
   /* Gradient border — simplified, no animation overhead */
   .gradient-border {
@@ -758,7 +768,12 @@
   .mobile-card { border-radius: 12px; padding: 16px; }
 
   /* Gradient text helpers (legacy compat) */
-  .text-gradient         { @apply text-gradient-hero; }
+  .text-gradient         {
+    background: linear-gradient(135deg, var(--foreground) 0%, var(--muted-foreground) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   .text-gradient-blue    {
     background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-indigo) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
