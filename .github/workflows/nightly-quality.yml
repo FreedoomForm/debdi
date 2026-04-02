@@ -1,0 +1,89 @@
+name: Nightly Quality
+
+on:
+  schedule:
+    # Daily at 03:17 UTC
+    - cron: '17 3 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+
+      - name: Quality report
+        run: corepack yarn quality:report > quality-report.md
+
+      - name: Typecheck
+        run: corepack yarn typecheck
+
+      - name: Lint
+        run: corepack yarn lint
+
+      - name: Build (capture output)
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db?schema=public
+          AUTH_SECRET: test-auth-secret
+          NEXTAUTH_SECRET: test-nextauth-secret
+          JWT_SECRET: test-jwt-secret
+        run: |
+          set -e
+          corepack yarn build 2>&1 | tee build.log
+
+      - name: Enforce bundle budgets
+        run: node scripts/parse-next-build.mjs build.log
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-quality
+          path: |
+            quality-report.md
+            build.log
+
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const title = `Nightly quality failed: ${new Date().toISOString().slice(0,10)}`;
+            const report = fs.existsSync('quality-report.md') ? fs.readFileSync('quality-report.md','utf8') : '(no quality-report.md)';
+            const build = fs.existsSync('build.log') ? fs.readFileSync('build.log','utf8') : '(no build.log)';
+            const body = [
+              'Automated nightly job failed.',
+              '',
+              '## Quality report',
+              '```',
+              report.slice(0, 60000),
+              '```',
+              '',
+              '## Build log (tail)',
+              '```',
+              build.slice(Math.max(0, build.length - 60000)),
+              '```',
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+            });
+

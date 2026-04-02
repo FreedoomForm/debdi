@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Gradient for the icon -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Icon gradient -->
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F7931E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGradient)"/>
+  
+  <!-- Inner circle (plate) -->
+  <circle cx="256" cy="256" r="140" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="8"/>
+  <circle cx="256" cy="256" r="110" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
+  
+  <!-- Fork on left -->
+  <g transform="translate(190, 160)">
+    <line x1="0" y1="0" x2="0" y2="140" stroke="white" stroke-width="12" stroke-linecap="round"/>
+    <line x1="-16" y1="0" x2="-16" y2="80" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <line x1="16" y1="0" x2="16" y2="80" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <line x1="-32" y1="0" x2="-32" y2="60" stroke="white" stroke-width="10" stroke-linecap="round"/>
+    <line x1="32" y1="0" x2="32" y2="60" stroke="white" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Spoon on right -->
+  <g transform="translate(322, 160)">
+    <ellipse cx="0" cy="20" rx="30" ry="40" fill="white"/>
+    <line x1="0" y1="60" x2="0" y2="140" stroke="white" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Location pin dot at bottom -->
+  <circle cx="256" cy="420" r="24" fill="url(#iconGrad)"/>
+  <path d="M256 380 L280 420 L232 420 Z" fill="url(#iconGrad)"/>
+</svg>
