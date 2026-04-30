@@ -25,7 +25,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
-import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Stats = {
   successfulOrders: number
