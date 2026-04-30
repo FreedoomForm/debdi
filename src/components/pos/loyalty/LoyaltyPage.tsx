@@ -33,6 +33,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { formatCurrency, formatDateTime } from '@/lib/pos'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type Program = {
   id: string
@@ -113,16 +114,12 @@ export function LoyaltyPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/terminal" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Award className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Программа лояльности</h1>
-          {program && (
+      <PosPageHeader
+        title="Программа лояльности"
+        icon={<Award className="h-4 w-4 text-amber-500" />}
+        backHref="/pos/terminal"
+        badge={
+          program ? (
             <Badge
               variant={program.isActive ? 'default' : 'secondary'}
               className={
@@ -133,12 +130,14 @@ export function LoyaltyPage() {
             >
               {program.isActive ? '● Активна' : 'Отключена'}
             </Badge>
-          )}
-        </div>
-        <Button size="icon" variant="ghost" onClick={() => load()}>
-          <RefreshCw className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
-        </Button>
-      </header>
+          ) : undefined
+        }
+        actions={
+          <Button size="icon" variant="ghost" onClick={() => load()}>
+            <RefreshCw className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
+          </Button>
+        }
+      />
 
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-6">
         {loading || !program ? (
