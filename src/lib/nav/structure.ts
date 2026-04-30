@@ -157,13 +157,14 @@ export const NAV: NavSection[] = [
   // ─── 6. CRM / Customers / Loyalty ───────────────────────────────────────
   {
     id: 'crm',
-    href: '/middle-admin?tab=clients',
+    href: '/pos/clients',
     label: 'Клиенты',
     icon: Users,
     desc: 'CRM, лояльность, чат',
     color: 'cyan',
     children: [
-      { id: 'clients', href: '/middle-admin?tab=clients', label: 'База клиентов', icon: Users, desc: 'Профили + история' },
+      { id: 'clients', href: '/pos/clients', label: 'База клиентов', icon: Users, desc: 'CRM, KPI, фильтры', badge: 'new' },
+      { id: 'clients-legacy', href: '/middle-admin?tab=clients', label: 'Клиенты (старая)', icon: Users, desc: 'Легаси-вид' },
       { id: 'loyalty', href: '/pos/loyalty', label: 'Лояльность', icon: Award, desc: 'Баллы и уровни' },
       { id: 'chat', href: '/middle-admin?tab=chat', label: 'Чат', icon: MessageSquare, desc: 'Внутренний мессенджер' },
       { id: 'website', href: '/middle-admin?tab=interface&sub=site', label: 'Сайт-витрина', icon: Globe, desc: 'Поддомен и контент' },
