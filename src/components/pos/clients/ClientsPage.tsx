@@ -372,24 +372,6 @@ export default function ClientsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-dashed">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <Users className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            Расширенные действия (массовое редактирование, авто-заказы, импорт/экспорт,
-            привязка курьеров) сохранены в{' '}
-            <a
-              href="/middle-admin?tab=clients"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              старой клиентской вкладке
-            </a>
-            . Эта новая страница использует тот же эндпоинт <code>/api/admin/clients</code> и
-            расширяет его сегментацией, KPI и экспортом.
-          </div>
-        </CardContent>
-      </Card>
-
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>

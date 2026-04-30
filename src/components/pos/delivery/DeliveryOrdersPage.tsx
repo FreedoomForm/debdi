@@ -21,7 +21,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-  ExternalLink,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
@@ -222,10 +221,9 @@ export default function DeliveryOrdersPage() {
             CSV
           </Button>
           <Button size="sm" asChild variant="outline">
-            <a href="/middle-admin?tab=orders&sub=map" target="_blank" rel="noreferrer">
+            <a href="/pos/delivery/map">
               <MapPin className="mr-1 h-4 w-4" />
               Лайв-карта
-              <ExternalLink className="ml-1 h-3 w-3" />
             </a>
           </Button>
         </div>
@@ -407,25 +405,6 @@ export default function DeliveryOrdersPage() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      <Card className="border-dashed">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <Truck className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            Расширенные действия (массовое редактирование, диспетчер,
-            оптимизация маршрутов через ORS, восстановление удалённых заказов)
-            доступны в{' '}
-            <a
-              href="/middle-admin?tab=orders"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              старой вкладке заказов
-            </a>
-            . Эта новая страница использует тот же эндпоинт <code>/api/orders</code> и
-            расширяет его лайв-обновлением, KPI и быстрой сменой статуса.
-          </div>
         </CardContent>
       </Card>
     </div>

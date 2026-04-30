@@ -271,29 +271,6 @@ export default function StatisticsPage() {
           </div>
         </CardContent>
       </Card>
-
-      <Card className="border-dashed">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <BarChart3 className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            Подробные графики, экспорт за период и сегментация доступны в{' '}
-            <a
-              href="/middle-admin?tab=statistics"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              старой статистике
-            </a>{' '}
-            и в{' '}
-            <a
-              href="/pos/reports"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              POS-отчётах
-            </a>
-            .
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

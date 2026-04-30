@@ -166,16 +166,6 @@ export default function DeliveryMapPage() {
                   })
               )}
             </ul>
-
-            <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[10px] text-muted-foreground">
-              Полная диспетчерская панель (с маршрутами и оптимизацией) доступна в старой админке:{' '}
-              <a
-                href="/middle-admin?tab=orders"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                /middle-admin?tab=orders
-              </a>
-            </div>
           </CardContent>
         </Card>
       </div>

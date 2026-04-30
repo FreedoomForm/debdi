@@ -437,23 +437,6 @@ export default function TrashPage() {
             </Card>
           </TabsContent>
         </Tabs>
-
-        <Card className="border-dashed">
-          <CardContent className="flex items-start gap-3 p-3 text-xs text-muted-foreground">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-            <div>
-              Старая корзина по-прежнему доступна:{' '}
-              <a
-                href="/middle-admin?tab=bin"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                /middle-admin?tab=bin
-              </a>
-              . Здесь — единый вид (клиенты + заказы) с пакетным восстановлением и
-              окончательным удалением.
-            </div>
-          </CardContent>
-        </Card>
       </main>
     </div>
   )

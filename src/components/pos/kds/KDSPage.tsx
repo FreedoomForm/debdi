@@ -162,7 +162,7 @@ export function KDSPage() {
   }, [orders])
 
   return (
-    <div className="flex h-screen flex-col bg-slate-950 text-slate-50">
+    <div className="flex min-h-[calc(100vh-3rem)] flex-col bg-slate-950 text-slate-50">
       {/* Top bar */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900 px-4">
         <div className="flex items-center gap-3">

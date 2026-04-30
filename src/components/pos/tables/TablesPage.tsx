@@ -213,7 +213,7 @@ export function TablesPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex min-h-[calc(100vh-3rem)] flex-col bg-background">
       <PosPageHeader
         title="Залы и столы"
         backHref="/pos/terminal"

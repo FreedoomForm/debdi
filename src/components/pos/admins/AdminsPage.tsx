@@ -380,24 +380,6 @@ export default function AdminsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-dashed">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            Расширенные действия (смена пароля, разрешения по табам, бэкап данных,
-            создание middle-админа из super-аккаунта) сохранены в{' '}
-            <a
-              href="/middle-admin?tab=admins"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              старой вкладке управления админами
-            </a>
-            . Эта новая страница использует те же эндпоинты и расширяет их KPI,
-            фильтрами и экспортом.
-          </div>
-        </CardContent>
-      </Card>
-
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>

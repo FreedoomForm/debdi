@@ -20,10 +20,7 @@ import { UnifiedTopBar } from './UnifiedTopBar'
 import { CommandPalette } from './CommandPalette'
 
 const FULLSCREEN_PATHS = [
-  '/pos/terminal',
-  '/pos/kds',
   '/pos/customer-display',
-  '/pos/tables',
 ]
 
 function SidebarFallback() {

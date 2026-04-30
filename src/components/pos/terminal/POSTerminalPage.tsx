@@ -269,10 +269,10 @@ export function POSTerminalPage({
   }, [cart.state.tableId])
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex min-h-[calc(100vh-3rem)] flex-col bg-background">
       {/* Top bar */}
       <PosPageHeader
-        backHref="/middle-admin"
+        backHref="/pos/dashboard"
         title={storeName}
         icon={
           <span className="hidden sm:block text-[11px] leading-tight text-muted-foreground">
@@ -282,15 +282,6 @@ export function POSTerminalPage({
         }
         actions={
           <>
-            <Button asChild size="sm" variant="ghost">
-              <Link href="/pos/kds">КДС</Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link href="/pos/tables">Столы</Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link href="/pos/shift">Смена</Link>
-            </Button>
             {/* Mobile cart toggle */}
             <Button
               type="button"

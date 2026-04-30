@@ -493,23 +493,6 @@ export function EmployeesPage() {
             })}
           </div>
         )}
-
-        <Card className="mt-4 border-dashed">
-          <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
-              Полный функционал управления доступен в старой панели:{' '}
-              <a
-                href="/middle-admin?tab=admins"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                /middle-admin?tab=admins
-              </a>{' '}
-              — массовые операции, расширенные настройки allowedTabs и история действий.
-              Здесь — быстрое управление повседневными аккаунтами без переключения экранов.
-            </div>
-          </CardContent>
-        </Card>
       </main>
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}>

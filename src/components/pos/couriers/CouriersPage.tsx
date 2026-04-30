@@ -21,7 +21,6 @@ import {
   Filter,
   Download,
   Pencil,
-  ExternalLink,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
@@ -252,10 +251,9 @@ export default function CouriersPage() {
             CSV
           </Button>
           <Button size="sm" asChild variant="outline">
-            <a href="/middle-admin?tab=orders&sub=map" target="_blank" rel="noreferrer">
+            <a href="/pos/delivery/map">
               <MapPin className="mr-1 h-4 w-4" />
               Лайв-карта
-              <ExternalLink className="ml-1 h-3 w-3" />
             </a>
           </Button>
         </div>
@@ -413,30 +411,6 @@ export default function CouriersPage() {
               )}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      <Card className="border-dashed">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <Truck className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            Расширенные действия (создание курьера, смена пароля, диспетчеризация заказов,
-            оптимизация маршрутов через ORS) доступны в{' '}
-            <a
-              href="/middle-admin?tab=admins&role=COURIER"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              старой вкладке управления курьерами
-            </a>{' '}
-            и на{' '}
-            <a
-              href="/middle-admin?tab=orders&sub=map"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              лайв-карте
-            </a>
-            .
-          </div>
         </CardContent>
       </Card>
 

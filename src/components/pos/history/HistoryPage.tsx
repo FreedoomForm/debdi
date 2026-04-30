@@ -343,23 +343,6 @@ export default function HistoryPage() {
             </div>
           </div>
         )}
-
-        <Card className="border-dashed">
-          <CardContent className="flex items-start gap-3 p-3 text-xs text-muted-foreground">
-            <HistoryIcon className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
-              Старая страница журнала действий доступна по{' '}
-              <a
-                href="/middle-admin?tab=history"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                /middle-admin?tab=history
-              </a>
-              . Эта новая страница использует те же endpoints и расширяет их KPI-сводкой,
-              быстрым поиском, фильтром по админу и периоду, пагинацией.
-            </div>
-          </CardContent>
-        </Card>
       </main>
     </div>
   )

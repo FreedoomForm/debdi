@@ -367,24 +367,6 @@ export default function SitesPage() {
             </Card>
 
             {/* Legacy pointer */}
-            <Card className="border-dashed">
-              <CardContent className="flex items-start gap-3 p-3 text-xs text-muted-foreground">
-                <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
-                <div>
-                  Расширенный билдер (AI-редактор контента, превью каждой
-                  страницы, стиль-варианты по разделам) доступен в старом
-                  интерфейсе:{' '}
-                  <a
-                    href="/middle-admin?tab=interface&sub=site"
-                    className="font-medium text-primary underline-offset-2 hover:underline"
-                  >
-                    /middle-admin?tab=interface&sub=site
-                  </a>
-                  . Новые и старые настройки синхронизированы — изменения
-                  отражаются в обеих UI.
-                </div>
-              </CardContent>
-            </Card>
           </>
         )}
       </main>

@@ -662,25 +662,6 @@ export default function FinancePage() {
               </CardContent>
             </Card>
           </div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm flex items-center gap-2">
-                <ReceiptText className="h-4 w-4" />
-                Старая страница финансов
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Полный функционал из старой админ-панели сохранён и доступен по ссылке{' '}
-              <a
-                href="/middle-admin?tab=finance"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                /middle-admin?tab=finance
-              </a>
-              . Эта новая страница использует те же эндпоинты и расширяет их KPI-сводкой,
-              фильтрами, экспортом в CSV и аналитикой по категориям.
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
 

@@ -501,24 +501,6 @@ export default function WarehousePage() {
         </TabsContent>
       </Tabs>
 
-      <Card className="border-dashed">
-        <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
-          <Layers className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            Полный функционал старого склада сохранён без изменений и доступен по{' '}
-            <a
-              href="/middle-admin?tab=warehouse"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              /middle-admin?tab=warehouse
-            </a>
-            : редактирование рецептов, дозаказ блюд через форму «Готовка», impact-план,
-            аудит готовки и т.д. Эта страница использует те же эндпоинты и расширяет их
-            KPI-сводкой, поиском и быстрой закупкой ингредиентов.
-          </div>
-        </CardContent>
-      </Card>
-
       <Dialog open={buyOpen} onOpenChange={setBuyOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>

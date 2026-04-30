@@ -381,19 +381,6 @@ export function SettingsPage() {
                   onChange={(v) => updateUiSettings({ enableAnimations: v })}
                 />
               </div>
-
-              <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
-                Полный вид старых настроек доступен по ссылке{' '}
-                <a
-                  href="/middle-admin?tab=interface"
-                  className={cn(
-                    'font-medium text-primary underline-offset-2 hover:underline'
-                  )}
-                >
-                  /middle-admin?tab=interface
-                </a>
-                 — эти настройки синхронизированы в обоих UI.
-              </div>
             </CardContent>
           </Card>
         )}
