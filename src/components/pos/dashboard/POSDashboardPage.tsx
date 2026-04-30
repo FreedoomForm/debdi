@@ -50,6 +50,7 @@ import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
 import { LiveStrip } from './LiveStrip'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -263,23 +264,17 @@ export function POSDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/middle-admin" aria-label="К админке">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+      <PosPageHeader
+        title="POS · Дашборд"
+        icon={<TrendingUp className="h-4 w-4 text-amber-500" />}
+        backHref="/middle-admin"
+        badge="Сегодня"
+        actions={
+          <Button size="icon" variant="ghost" onClick={() => load()}>
+            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
           </Button>
-          <TrendingUp className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">POS · Дашборд</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            Сегодня
-          </Badge>
-        </div>
-        <Button size="icon" variant="ghost" onClick={() => load()}>
-          <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-        </Button>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-7xl space-y-5 px-4 py-5">
         <LiveStrip />

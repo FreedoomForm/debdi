@@ -20,6 +20,7 @@ import {
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { useCart } from './use-cart'
 import { ProductGrid } from './ProductGrid'
 import { CartPanel } from './CartPanel'
@@ -270,47 +271,41 @@ export function POSTerminalPage({
   return (
     <div className="flex h-screen flex-col bg-background">
       {/* Top bar */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/middle-admin" aria-label="Назад в админку">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <div className="text-sm font-semibold leading-tight">
-              {storeName}
-            </div>
-            <div className="text-[11px] leading-tight text-muted-foreground">
-              {cashierName ? `Кассир: ${cashierName}` : 'Терминал'}
-              {shiftId ? ' · смена открыта' : ' · смена не открыта'}
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/pos/kds">КДС</Link>
-          </Button>
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/pos/tables">Столы</Link>
-          </Button>
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/pos/shift">Смена</Link>
-          </Button>
-          {/* Mobile cart toggle */}
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="lg:hidden"
-            onClick={() => setMobileCartOpen(true)}
-          >
-            <ShoppingCart className="mr-1.5 h-4 w-4" />
-            <span>{cart.totals.itemsCount}</span>
-            <ChevronRight className="ml-0.5 h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        backHref="/middle-admin"
+        title={storeName}
+        icon={
+          <span className="hidden sm:block text-[11px] leading-tight text-muted-foreground">
+            {cashierName ? `Кассир: ${cashierName}` : 'Терминал'}
+            {shiftId ? ' · смена открыта' : ' · смена не открыта'}
+          </span>
+        }
+        actions={
+          <>
+            <Button asChild size="sm" variant="ghost">
+              <Link href="/pos/kds">КДС</Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost">
+              <Link href="/pos/tables">Столы</Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost">
+              <Link href="/pos/shift">Смена</Link>
+            </Button>
+            {/* Mobile cart toggle */}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="lg:hidden"
+              onClick={() => setMobileCartOpen(true)}
+            >
+              <ShoppingCart className="mr-1.5 h-4 w-4" />
+              <span>{cart.totals.itemsCount}</span>
+              <ChevronRight className="ml-0.5 h-3.5 w-3.5" />
+            </Button>
+          </>
+        }
+      />
 
       {/* Main split */}
       <div className="flex min-h-0 flex-1">
