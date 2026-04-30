@@ -175,7 +175,7 @@ export function EmployeesPage() {
 
   const openEdit = (e: Employee) => {
     if (e.role === 'SUPER_ADMIN' || e.role === 'MIDDLE_ADMIN') {
-      toast.error('Роль управляется только из /middle-admin')
+      toast.error('Эту роль может менять только Super Admin')
       return
     }
     setFormMode('edit')
@@ -238,7 +238,7 @@ export function EmployeesPage() {
 
   const toggleActive = async (e: Employee) => {
     if (e.role === 'SUPER_ADMIN' || e.role === 'MIDDLE_ADMIN') {
-      toast.error('Эта роль управляется только из /middle-admin')
+      toast.error('Эту роль может менять только Super Admin')
       return
     }
     setPendingId(e.id)
@@ -285,7 +285,7 @@ export function EmployeesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="Сотрудники"
         icon={<Users className="h-4 w-4 text-amber-500" />}

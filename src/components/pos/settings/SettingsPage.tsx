@@ -127,8 +127,8 @@ export function SettingsPage() {
 
   if (!hydrated) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="grid h-screen place-items-center text-sm text-muted-foreground">
+      <div className="min-h-[calc(100vh-3rem)] bg-background">
+        <div className="grid min-h-[calc(100vh-3rem)] place-items-center text-sm text-muted-foreground">
           Загрузка…
         </div>
       </div>
@@ -136,7 +136,7 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="Настройки"
         icon={<Cog className="h-4 w-4 text-amber-500" />}

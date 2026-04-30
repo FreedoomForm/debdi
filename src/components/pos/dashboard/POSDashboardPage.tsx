@@ -263,11 +263,11 @@ export function POSDashboardPage() {
   }, [load])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="POS · Дашборд"
         icon={<TrendingUp className="h-4 w-4 text-amber-500" />}
-        backHref="/middle-admin"
+        backHref="/pos/dashboard"
         badge="Сегодня"
         actions={
           <Button size="icon" variant="ghost" onClick={() => load()}>

@@ -81,7 +81,7 @@ export function LiveStrip() {
         }
       />
       <Tile
-        href="/middle-admin"
+        href="/pos/dashboard"
         icon={<Bell className="h-3.5 w-3.5" />}
         label="Уведомления"
         value={String(snap.unreadNotifs)}

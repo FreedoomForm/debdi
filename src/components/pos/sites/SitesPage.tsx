@@ -159,7 +159,7 @@ export default function SitesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="Сайт-витрина"
         icon={<Globe className="h-4 w-4 text-cyan-500" />}

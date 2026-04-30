@@ -165,7 +165,7 @@ export default function HistoryPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="Журнал действий"
         icon={<HistoryIcon className="h-4 w-4 text-amber-500" />}

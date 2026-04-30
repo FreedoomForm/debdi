@@ -252,7 +252,7 @@ export function OrdersHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="Журнал заказов"
         icon={<ReceiptIcon className="h-4 w-4 text-amber-500" />}

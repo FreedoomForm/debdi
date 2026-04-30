@@ -122,7 +122,7 @@ export function ShiftPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
         title="Касса · Смена"
         backHref="/pos/terminal"
