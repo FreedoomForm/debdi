@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { UnifiedSidebar } from './UnifiedSidebar'
+import { UnifiedTopBar } from './UnifiedTopBar'
 import { CommandPalette } from './CommandPalette'
 
 const FULLSCREEN_PATHS = [
@@ -54,7 +55,13 @@ export function UnifiedShell({ children }: { children: React.ReactNode }) {
         userRole={(session?.user as any)?.role}
         onLogout={() => signOut({ callbackUrl: '/login' })}
       />
-      <main className="ml-0 min-w-0 flex-1 lg:ml-[312px]">{children}</main>
+      <div className="ml-0 flex min-w-0 flex-1 flex-col lg:ml-[312px]">
+        <UnifiedTopBar
+          onOpenPalette={() => setPaletteOpen(true)}
+          userEmail={(session?.user as any)?.email ?? null}
+        />
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </div>
   )

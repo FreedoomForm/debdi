@@ -96,7 +96,7 @@ import { TrialStatus } from '@/components/admin/TrialStatus'
 import { ChangePasswordModal } from '@/components/admin/ChangePasswordModal'
 import { SiteBuilderCard } from '@/components/admin/SiteBuilderCard'
 import { getDailyPrice, PLAN_TYPES } from '@/lib/menuData'
-import { CANONICAL_TABS, deriveVisibleTabs, type CanonicalTabId } from '@/components/admin/dashboard/tabs'
+import { CANONICAL_TABS, deriveVisibleTabs, mapLegacyAllowedTabId, type CanonicalTabId } from '@/components/admin/dashboard/tabs'
 import { DASHBOARD_TAB_META } from '@/components/admin/dashboard/tabMeta'
 import type { Client, Order } from '@/components/admin/dashboard/types'
 import { DesktopTabsNav } from '@/components/admin/dashboard/DesktopTabsNav'
@@ -626,6 +626,15 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
 
     if (searchParams.get('settings') === '1') setIsSettingsOpen(true)
     if (searchParams.get('chat') === '1') setIsChatOpen(true)
+
+    // Deep-link support for the unified nav: ?tab=<id> selects the tab.
+    const requestedTab = searchParams.get('tab')
+    if (requestedTab) {
+      // Run through the legacy-id mapper so old aliases (e.g. "settings" →
+      // "interface") still work for the unified nav. visibleTabs is derived
+      // later; passing through legacy ids that are still valid is harmless.
+      setActiveTab(mapLegacyAllowedTabId(requestedTab))
+    }
   }, [searchParams])
 
   // Use local (calendar) dates for matching `deliveryDate` (stored as YYYY-MM-DD).
