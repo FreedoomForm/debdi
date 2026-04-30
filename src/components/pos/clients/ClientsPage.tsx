@@ -50,6 +50,7 @@ import {
 } from '@/components/ui/dialog'
 import { formatCurrency } from '@/lib/pos'
 import { cn } from '@/lib/utils'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Client = {
   id: string
@@ -230,28 +231,28 @@ export default function ClientsPage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI
+        <KpiTile
           label="Всего"
-          value={String(stats.total)}
+          value={stats.total}
           icon={<Users className="h-4 w-4" />}
           tone="neutral"
           hint={`${stats.active} активных`}
         />
-        <KPI
+        <KpiTile
           label="Долги"
           value={formatCurrency(stats.debtTotal, 'UZS')}
           icon={<AlertTriangle className="h-4 w-4" />}
           tone={stats.debtTotal > 0 ? 'rose' : 'neutral'}
           hint={`${stats.debtCount} клиентов в минусе`}
         />
-        <KPI
+        <KpiTile
           label="Предоплаты"
           value={formatCurrency(stats.prepaidTotal, 'UZS')}
           icon={<Wallet className="h-4 w-4" />}
           tone={stats.prepaidTotal > 0 ? 'emerald' : 'neutral'}
           hint={`${stats.prepaidCount} с балансом`}
         />
-        <KPI
+        <KpiTile
           label="LTV (сумма)"
           value={formatCurrency(stats.ltv, 'UZS')}
           icon={<TrendingUp className="h-4 w-4" />}

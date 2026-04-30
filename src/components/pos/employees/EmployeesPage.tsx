@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Role = 'SUPER_ADMIN' | 'MIDDLE_ADMIN' | 'LOW_ADMIN' | 'COURIER' | 'WORKER'
 
@@ -311,10 +312,10 @@ export function EmployeesPage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-2 border-b border-border bg-card p-3 sm:grid-cols-4">
-        <KPI label="Всего" value={String(stats.total)} tone="neutral" />
-        <KPI label="Активные" value={String(stats.active)} tone="emerald" />
-        <KPI label="На смене" value={String(stats.onShift)} tone="amber" />
-        <KPI label="Заблокированы" value={String(stats.blocked)} tone="rose" />
+        <KpiTile label="Всего" value={stats.total} tone="neutral" />
+        <KpiTile label="Активные" value={stats.active} tone="emerald" />
+        <KpiTile label="На смене" value={stats.onShift} tone="amber" />
+        <KpiTile label="Заблокированы" value={stats.blocked} tone="rose" />
       </div>
 
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-card px-3 py-2">
@@ -648,25 +649,4 @@ export function EmployeesPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: string
-  tone: 'emerald' | 'rose' | 'amber' | 'neutral'
-}) {
-  const cls = {
-    emerald: 'border-emerald-200 bg-emerald-50/60 text-emerald-900',
-    rose: 'border-rose-200 bg-rose-50/60 text-rose-900',
-    amber: 'border-amber-200 bg-amber-50/60 text-amber-900',
-    neutral: 'border-border bg-card text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-lg border p-2 shadow-sm', cls)}>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="mt-0.5 text-base font-bold tabular-nums">{value}</div>
-    </div>
-  )
-}
+// KPI tile is now provided by @/components/pos/shared/KpiTile

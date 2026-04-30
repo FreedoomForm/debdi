@@ -89,7 +89,8 @@ export const NAV: NavSection[] = [
       { id: 'statistics-new', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории', badge: 'new' },
       { id: 'statistics-legacy', href: '/middle-admin?tab=statistics', label: 'Статистика (старая)', icon: BarChart3, desc: 'Легаси-вид' },
       { id: 'live-status', href: '/pos/dashboard?focus=live', label: 'Лайв-статус', icon: TrendingUp, desc: 'Что происходит сейчас', badge: 'live' },
-      { id: 'history', href: '/middle-admin?tab=history', label: 'Журнал действий', icon: History, desc: 'Аудит-лог' },
+      { id: 'history', href: '/pos/history', label: 'Журнал действий', icon: History, desc: 'KPI, фильтры по админу/дате, пагинация', badge: 'new' },
+      { id: 'history-legacy', href: '/middle-admin?tab=history', label: 'Журнал (старый)', icon: History, desc: 'Легаси-вид' },
     ],
   },
   // ─── 2. Sales / POS Terminal ────────────────────────────────────────────
