@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { UnifiedShell } from '@/components/layout/UnifiedShell'
 
 export const metadata: Metadata = {
   title: 'Super Admin',
@@ -6,6 +7,6 @@ export const metadata: Metadata = {
 }
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
-  return children
+  return <UnifiedShell>{children}</UnifiedShell>
 }
 
