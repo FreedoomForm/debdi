@@ -49,6 +49,7 @@ import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { Field } from '@/components/pos/shared/FormPrimitives'
 import { formatCurrency, type PosCategory, type PosProduct } from '@/lib/pos'
 
 type EditableProduct = Partial<PosProduct> & { name: string; sellPrice: number }
@@ -628,38 +629,7 @@ export function ProductsManagerPage() {
   )
 }
 
-function Field({
-  label,
-  children,
-  full,
-}: {
-  label: string
-  children: React.ReactNode
-  full?: boolean
-}) {
-  return (
-    <div className={cn(full && 'sm:col-span-2')}>
-      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </Label>
-      <div className="mt-1">{children}</div>
-    </div>
-  )
-}
-
-function ToggleField({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
-  return (
-    <label className="flex cursor-pointer items-center justify-between rounded-md border border-border bg-secondary/30 px-3 py-2">
-      <span className="text-sm font-medium">{label}</span>
-      <Switch checked={checked} onCheckedChange={onChange} />
-    </label>
-  )
-}
+// Field / ToggleField now sourced from @/components/pos/shared/FormPrimitives.
+// ToggleField is the same shape as Toggle without the optional 'hint' prop.
+import { Toggle as ToggleField } from '@/components/pos/shared/FormPrimitives'
+export { ToggleField }
