@@ -20,10 +20,16 @@ import {
   Check,
   Cog,
   Globe,
+  Monitor,
+  Moon,
+  Palette,
   Percent,
   Receipt,
   Save,
+  Sun,
 } from 'lucide-react'
+import { useAdminSettings } from '@/hooks/useAdminSettings'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -88,6 +94,11 @@ export function SettingsPage() {
   const [settings, setSettings] = useState<PosSettings>(DEFAULTS)
   const [hydrated, setHydrated] = useState(false)
   const [saving, setSaving] = useState(false)
+  const {
+    settings: uiSettings,
+    updateSettings: updateUiSettings,
+    mounted: uiMounted,
+  } = useAdminSettings()
 
   useEffect(() => {
     setSettings(load())
@@ -303,6 +314,92 @@ export function SettingsPage() {
             <LinkRow href="/pos/branches" label="Филиалы" desc="Сеть локаций" />
           </CardContent>
         </Card>
+
+        {/* Interface settings (migrated from legacy InterfaceSettings) */}
+        {uiMounted && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Palette className="h-4 w-4 text-amber-500" />
+                Интерфейс
+              </CardTitle>
+              <CardDescription>
+                Персональные настройки этого браузера. Мигрированы из легаси
+                «Настройки · Интерфейс» в старой админке.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="mb-2 block text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Тема оформления
+                </Label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    type="button"
+                    variant={uiSettings.theme === 'light' ? 'default' : 'outline'}
+                    className="w-full"
+                    onClick={() => updateUiSettings({ theme: 'light' })}
+                  >
+                    <Sun className="mr-2 h-4 w-4" />
+                    Светлая
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={uiSettings.theme === 'dark' ? 'default' : 'outline'}
+                    className="w-full"
+                    onClick={() => updateUiSettings({ theme: 'dark' })}
+                  >
+                    <Moon className="mr-2 h-4 w-4" />
+                    Тёмная
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={uiSettings.theme === 'system' ? 'default' : 'outline'}
+                    className="w-full"
+                    onClick={() => updateUiSettings({ theme: 'system' })}
+                  >
+                    <Monitor className="mr-2 h-4 w-4" />
+                    Система
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Toggle
+                  label="Компактный режим"
+                  hint="Уменьшает отступы и размер элементов интерфейса"
+                  checked={uiSettings.compactMode}
+                  onChange={(v) => updateUiSettings({ compactMode: v })}
+                />
+                <Toggle
+                  label="Показывать KPI-блок"
+                  hint="Сводка выручки и заказов на дашборде"
+                  checked={uiSettings.showStats}
+                  onChange={(v) => updateUiSettings({ showStats: v })}
+                />
+                <Toggle
+                  label="Анимации"
+                  hint="Анимированные переходы и fade-in эффекты"
+                  checked={uiSettings.enableAnimations}
+                  onChange={(v) => updateUiSettings({ enableAnimations: v })}
+                />
+              </div>
+
+              <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-[11px] text-muted-foreground">
+                Полный вид старых настроек доступен по ссылке{' '}
+                <a
+                  href="/middle-admin?tab=interface"
+                  className={cn(
+                    'font-medium text-primary underline-offset-2 hover:underline'
+                  )}
+                >
+                  /middle-admin?tab=interface
+                </a>
+                 — эти настройки синхронизированы в обоих UI.
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   )
