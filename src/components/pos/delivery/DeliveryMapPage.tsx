@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import type { CourierPin } from './CourierMap'
 
 // Leaflet must run client-side only — `window` access at module eval.
@@ -71,29 +72,21 @@ export default function DeliveryMapPage() {
 
   return (
     <div className="flex h-[calc(100vh-3rem)] flex-col">
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/delivery" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <MapPin className="h-4 w-4 text-indigo-500" />
-          <h1 className="text-sm font-semibold">Live-карта курьеров</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {withCoords.length} / {all.length}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-muted-foreground">
-            Обновление каждые 15 сек
-          </span>
-          <Button size="sm" variant="outline" onClick={refresh} disabled={loading}>
-            <RefreshCw className={cn('mr-1 h-3.5 w-3.5', loading && 'animate-spin')} />
-            Обновить
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Live-карта курьеров"
+        icon={<MapPin className="h-4 w-4 text-indigo-500" />}
+        backHref="/pos/delivery"
+        badge={`${withCoords.length} / ${all.length}`}
+        actions={
+          <>
+            <span className="text-[11px] text-muted-foreground">Обновление каждые 15 сек</span>
+            <Button size="sm" variant="outline" onClick={refresh} disabled={loading}>
+              <RefreshCw className={cn('mr-1 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+          </>
+        }
+      />
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 p-3 lg:grid-cols-[1fr_320px]">
         {/* Map */}

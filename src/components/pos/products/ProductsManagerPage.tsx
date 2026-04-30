@@ -48,6 +48,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { formatCurrency, type PosCategory, type PosProduct } from '@/lib/pos'
 
 type EditableProduct = Partial<PosProduct> & { name: string; sellPrice: number }
@@ -207,28 +208,30 @@ export function ProductsManagerPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Package className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Товары</h1>
-          {lowStockCount > 0 && (
+      <PosPageHeader
+        title="Товары"
+        icon={<Package className="h-4 w-4 text-amber-500" />}
+        badge={
+          lowStockCount > 0 ? (
             <Badge variant="destructive" className="text-[10px]">
               <AlertTriangle className="mr-1 h-3 w-3" />
               Мало: {lowStockCount}
             </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-            Обновить
-          </Button>
-          <Button size="sm" onClick={startCreate}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Новый товар
-          </Button>
-        </div>
-      </header>
+          ) : undefined
+        }
+        actions={
+          <>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+            <Button size="sm" onClick={startCreate}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Новый товар
+            </Button>
+          </>
+        }
+      />
 
       {/* Filters */}
       <div className="flex shrink-0 flex-wrap gap-2 border-b border-border bg-card px-3 py-2">
