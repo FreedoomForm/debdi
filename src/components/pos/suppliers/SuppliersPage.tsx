@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type Supplier = {
   id: string
@@ -132,39 +133,33 @@ export function SuppliersPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/terminal" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Boxes className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Поставщики</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="relative w-[240px]">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Поиск"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="h-9 pl-9"
-            />
-          </div>
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw
-              className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
-            />
-            Обновить
-          </Button>
-          <Button size="sm" onClick={() => setEditing({ ...EMPTY })}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Поставщик
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Поставщики"
+        icon={<Boxes className="h-4 w-4 text-amber-500" />}
+        backHref="/pos/terminal"
+        actions={
+          <>
+            <div className="relative w-[240px]">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Поиск"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="h-9 pl-9"
+              />
+            </div>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+            <Button size="sm" onClick={() => setEditing({ ...EMPTY })}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Поставщик
+            </Button>
+          </>
+        }
+      />
 
       <main className="mx-auto max-w-5xl px-4 py-6">
         {loading ? (

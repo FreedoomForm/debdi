@@ -34,6 +34,7 @@ import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
 import { RevenueTrendChart } from './RevenueTrendChart'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -127,29 +128,22 @@ export function ReportsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <BarChart3 className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Отчёты</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={exportCsv} disabled={!report}>
-            <Download className="mr-1.5 h-3.5 w-3.5" />
-            CSV
-          </Button>
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw
-              className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
-            />
-            Обновить
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Отчёты"
+        icon={<BarChart3 className="h-4 w-4 text-amber-500" />}
+        actions={
+          <>
+            <Button size="sm" variant="outline" onClick={exportCsv} disabled={!report}>
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              CSV
+            </Button>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+          </>
+        }
+      />
 
       <main className="mx-auto max-w-6xl space-y-5 px-4 py-5">
         {/* Date range */}

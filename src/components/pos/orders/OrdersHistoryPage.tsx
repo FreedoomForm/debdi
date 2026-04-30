@@ -40,6 +40,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { formatCurrency, formatDateTime, formatTime } from '@/lib/pos'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type OrderItem = {
   id: string
@@ -252,24 +253,18 @@ export function OrdersHistoryPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/terminal" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+      <PosPageHeader
+        title="Журнал заказов"
+        icon={<ReceiptIcon className="h-4 w-4 text-amber-500" />}
+        backHref="/pos/terminal"
+        badge={visible.length}
+        actions={
+          <Button size="sm" variant="outline" onClick={load}>
+            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+            Обновить
           </Button>
-          <ReceiptIcon className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Журнал заказов</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {visible.length}
-          </Badge>
-        </div>
-        <Button size="sm" variant="outline" onClick={load}>
-          <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-          Обновить
-        </Button>
-      </header>
+        }
+      />
 
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-card px-3 py-2">
         <div className="relative min-w-[260px] flex-1">
