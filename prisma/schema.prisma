@@ -1123,3 +1123,120 @@ enum CashDrawerMoveType {
   CHANGE_FUND // change brought in
   ADJUSTMENT // manual reconciliation
 }
+
+// ─── Tip Pool ─────────────────────────────────────────────────────────────
+// Tip pooling and distribution. Inspired by Toast POS tip-pool / tip-share.
+// At end of shift / day the manager opens a tip-pool for a date range and
+// distributes the collected tips across selected employees by weight (e.g.
+// servers 50%, kitchen 30%, support 20%).
+
+model TipPool {
+  id            String           @id @default(cuid())
+  ownerAdminId  String
+  fromDate      DateTime
+  toDate        DateTime
+  totalAmount   Float            @default(0)
+  status        TipPoolStatus    @default(OPEN)
+  createdBy     String? // Admin id
+  notes         String?
+  shares        TipPoolShare[]
+  createdAt     DateTime         @default(now())
+  closedAt      DateTime?
+
+  @@index([ownerAdminId, fromDate])
+  @@map("tip_pools")
+}
+
+enum TipPoolStatus {
+  OPEN
+  DISTRIBUTED
+  CANCELED
+}
+
+model TipPoolShare {
+  id          String   @id @default(cuid())
+  poolId      String
+  pool        TipPool  @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  employeeId  String // Admin id
+  weight      Float    @default(1) // Relative weight; share = weight / sum(weights) * pool.totalAmount
+  computedAmount Float @default(0)
+  paidOut     Boolean  @default(false)
+  paidOutAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([poolId])
+  @@index([employeeId])
+  @@map("tip_pool_shares")
+}
+
+// ─── Shift Checklist ─────────────────────────────────────────────────────
+// Digital opening/closing checklist required before / after each shift.
+// Inspired by Lightspeed K-Series March 2026 release. The owner defines a
+// list of templates; when a cashier opens / closes a shift, an instance is
+// generated and they tick boxes off — only then can the shift transition.
+
+model ShiftChecklistTemplate {
+  id           String                @id @default(cuid())
+  ownerAdminId String
+  name         String // "Opening checklist", "Bar closing"
+  phase        ShiftChecklistPhase   @default(OPENING)
+  isActive     Boolean               @default(true)
+  items        ShiftChecklistItem[]
+  instances    ShiftChecklistInstance[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@index([ownerAdminId, phase])
+  @@map("shift_checklist_templates")
+}
+
+enum ShiftChecklistPhase {
+  OPENING
+  CLOSING
+  MIDSHIFT
+}
+
+model ShiftChecklistItem {
+  id          String                  @id @default(cuid())
+  templateId  String
+  template    ShiftChecklistTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  label       String // "Counted opening float", "Cleaned grill"
+  required    Boolean                 @default(true)
+  sortOrder   Int                     @default(0)
+  responses   ShiftChecklistResponse[]
+  createdAt   DateTime                @default(now())
+
+  @@index([templateId, sortOrder])
+  @@map("shift_checklist_items")
+}
+
+model ShiftChecklistInstance {
+  id           String                   @id @default(cuid())
+  templateId   String
+  template     ShiftChecklistTemplate   @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  shiftId      String? // CashierShift id (optional — checklist can be daily too)
+  performedBy  String // Admin id
+  startedAt    DateTime                 @default(now())
+  completedAt  DateTime?
+  responses    ShiftChecklistResponse[]
+  createdAt    DateTime                 @default(now())
+
+  @@index([shiftId])
+  @@index([performedBy, startedAt])
+  @@map("shift_checklist_instances")
+}
+
+model ShiftChecklistResponse {
+  id          String                  @id @default(cuid())
+  instanceId  String
+  instance    ShiftChecklistInstance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  itemId      String
+  item        ShiftChecklistItem      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  checked     Boolean                 @default(false)
+  note        String?
+  checkedAt   DateTime?
+  createdAt   DateTime                @default(now())
+
+  @@unique([instanceId, itemId])
+  @@map("shift_checklist_responses")
+}
