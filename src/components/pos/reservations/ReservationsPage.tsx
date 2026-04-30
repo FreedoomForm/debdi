@@ -16,12 +16,16 @@ import {
   ArrowLeft,
   CalendarDays,
   Check,
+  CheckCircle2,
   Clock,
   Loader2,
+  LogIn,
   Phone,
   Plus,
+  Trash2,
   Users,
   X,
+  XCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -103,6 +107,7 @@ export function ReservationsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [busy, setBusy] = useState(false)
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -140,6 +145,55 @@ export function ReservationsPage() {
       ),
     [items]
   )
+
+  const updateStatus = async (
+    r: Reservation,
+    next: Reservation['status']
+  ) => {
+    setRowBusyId(r.id)
+    try {
+      const res = await fetch(`/api/pos/reservations/${r.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: next }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const label = STATUS_LABELS[next]?.label ?? next
+      toast.success(`Статус: ${label}`)
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const deleteReservation = async (r: Reservation) => {
+    const ok =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm(`Удалить резерв «${r.customerName}»?`)
+    if (!ok) return
+    setRowBusyId(r.id)
+    try {
+      const res = await fetch(`/api/pos/reservations/${r.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Резерв удалён')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
 
   const create = async () => {
     if (!form.customerName.trim() || !form.startsAt) return
@@ -278,6 +332,96 @@ export function ReservationsPage() {
                           ✎ {r.notes}
                         </p>
                       )}
+
+                      <div className="mt-2 flex flex-wrap items-center gap-1">
+                        {r.status === 'BOOKED' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => updateStatus(r, 'CONFIRMED')}
+                            disabled={rowBusyId === r.id}
+                          >
+                            <CheckCircle2 className="mr-1 h-3 w-3" />
+                            Подтвердить
+                          </Button>
+                        )}
+                        {(r.status === 'BOOKED' || r.status === 'CONFIRMED') && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => updateStatus(r, 'ARRIVED')}
+                            disabled={rowBusyId === r.id}
+                          >
+                            <LogIn className="mr-1 h-3 w-3" />
+                            Пришёл
+                          </Button>
+                        )}
+                        {(r.status === 'ARRIVED' || r.status === 'CONFIRMED' || r.status === 'BOOKED') && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => updateStatus(r, 'SEATED')}
+                            disabled={rowBusyId === r.id}
+                          >
+                            <Users className="mr-1 h-3 w-3" />
+                            Посадить
+                          </Button>
+                        )}
+                        {r.status === 'SEATED' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => updateStatus(r, 'COMPLETED')}
+                            disabled={rowBusyId === r.id}
+                          >
+                            <Check className="mr-1 h-3 w-3" />
+                            Завершить
+                          </Button>
+                        )}
+                        {r.status !== 'CANCELED' &&
+                          r.status !== 'COMPLETED' &&
+                          r.status !== 'NO_SHOW' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                                onClick={() => updateStatus(r, 'CANCELED')}
+                                disabled={rowBusyId === r.id}
+                              >
+                                <XCircle className="mr-1 h-3 w-3" />
+                                Отменить
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 px-2 text-xs text-amber-700 hover:bg-amber-50"
+                                onClick={() => updateStatus(r, 'NO_SHOW')}
+                                disabled={rowBusyId === r.id}
+                              >
+                                Не пришёл
+                              </Button>
+                            </>
+                          )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                          onClick={() => deleteReservation(r)}
+                          disabled={rowBusyId === r.id}
+                          aria-label="Удалить"
+                        >
+                          {rowBusyId === r.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </article>
                 </li>
