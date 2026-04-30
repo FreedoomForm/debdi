@@ -117,9 +117,10 @@ export const NAV: NavSection[] = [
     color: 'rose',
     children: [
       { id: 'kds', href: '/pos/kds', label: 'KDS · Дисплей', icon: ChefHat, desc: 'Активные тикеты' },
-      { id: 'cooking', href: '/middle-admin?tab=warehouse&sub=cooking', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд' },
-      { id: 'menu-sets', href: '/middle-admin?tab=warehouse&sub=sets', label: 'Меню-сеты', icon: Layers, desc: 'Калорийные группы' },
-      { id: 'dishes', href: '/middle-admin?tab=warehouse&sub=dishes', label: 'Блюда', icon: Utensils, desc: 'Рецепты, ингредиенты' },
+      { id: 'cooking', href: '/pos/warehouse?tab=cooking', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд' },
+      { id: 'menu-sets', href: '/pos/warehouse?tab=sets', label: 'Меню-сеты', icon: Layers, desc: 'Калорийные группы' },
+      { id: 'dishes', href: '/pos/warehouse?tab=dishes', label: 'Блюда', icon: Utensils, desc: 'Рецепты, ингредиенты' },
+      { id: 'cooking-legacy', href: '/middle-admin?tab=warehouse&sub=cooking', label: 'План (старая)', icon: ChefHat, desc: 'Легаси-вид' },
     ],
   },
   // ─── 4. Tables / Reservations / Floor ───────────────────────────────────
@@ -147,7 +148,8 @@ export const NAV: NavSection[] = [
       { id: 'products', href: '/pos/products', label: 'Товары', icon: Package, desc: 'SKU, цены, остатки' },
       { id: 'categories', href: '/pos/categories', label: 'Категории', icon: FolderTree, desc: 'Группы товаров' },
       { id: 'inventory', href: '/pos/inventory', label: 'Движения склада', icon: Boxes, desc: 'Аудит остатков' },
-      { id: 'warehouse', href: '/middle-admin?tab=warehouse', label: 'Склад продуктов', icon: Boxes, desc: 'Сырьё для блюд' },
+      { id: 'warehouse', href: '/pos/warehouse', label: 'Склад продуктов', icon: Boxes, desc: 'Сырьё для блюд', badge: 'new' },
+      { id: 'warehouse-legacy', href: '/middle-admin?tab=warehouse', label: 'Склад (старая)', icon: Boxes, desc: 'Легаси-вид' },
       { id: 'suppliers', href: '/pos/suppliers', label: 'Поставщики', icon: Truck, desc: 'Контакты' },
       { id: 'purchase-orders', href: '/pos/suppliers?tab=po', label: 'Закупки', icon: Tag, desc: 'Заказы поставщикам' },
     ],
