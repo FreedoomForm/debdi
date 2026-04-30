@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type ActionLog = {
   id: string
@@ -165,24 +166,17 @@ export default function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+      <PosPageHeader
+        title="Журнал действий"
+        icon={<HistoryIcon className="h-4 w-4 text-amber-500" />}
+        badge={total}
+        actions={
+          <Button size="sm" variant="outline" onClick={loadLogs} disabled={loading}>
+            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+            Обновить
           </Button>
-          <HistoryIcon className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Журнал действий</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {total}
-          </Badge>
-        </div>
-        <Button size="sm" variant="outline" onClick={loadLogs} disabled={loading}>
-          <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-          Обновить
-        </Button>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-[1400px] space-y-3 p-3 lg:p-4">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

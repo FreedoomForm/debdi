@@ -35,6 +35,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type StylePreset = {
   id: string
@@ -158,38 +159,29 @@ export default function SitesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Globe className="h-4 w-4 text-cyan-500" />
-          <h1 className="text-sm font-semibold">Сайт-витрина</h1>
-          {data?.website.subdomain && (
-            <Badge variant="secondary" className="text-[10px]">
-              {data.website.subdomain}
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw
-              className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
-            />
-            Обновить
-          </Button>
-          <Button size="sm" onClick={save} disabled={saving}>
-            {saving ? (
-              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Save className="mr-1.5 h-3.5 w-3.5" />
-            )}
-            Сохранить
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Сайт-витрина"
+        icon={<Globe className="h-4 w-4 text-cyan-500" />}
+        badge={data?.website.subdomain || undefined}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+              <RefreshCw
+                className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
+              />
+              Обновить
+            </Button>
+            <Button size="sm" onClick={save} disabled={saving}>
+              {saving ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              Сохранить
+            </Button>
+          </>
+        }
+      />
 
       <main className="mx-auto max-w-3xl space-y-4 p-4 lg:p-6">
         {loading && !data ? (

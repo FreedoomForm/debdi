@@ -41,6 +41,7 @@ import {
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type BinClient = {
   id: string
@@ -240,24 +241,17 @@ export default function TrashPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+      <PosPageHeader
+        title="Корзина"
+        icon={<Trash2 className="h-4 w-4 text-rose-500" />}
+        badge={clients.length + orders.length}
+        actions={
+          <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+            Обновить
           </Button>
-          <Trash2 className="h-4 w-4 text-rose-500" />
-          <h1 className="text-sm font-semibold">Корзина</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {clients.length + orders.length}
-          </Badge>
-        </div>
-        <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-          <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-          Обновить
-        </Button>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-[1400px] space-y-3 p-3 lg:p-4">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
