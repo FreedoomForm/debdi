@@ -56,6 +56,7 @@ import {
 import { formatCurrency } from '@/lib/pos'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { Row } from '@/components/pos/shared/FormPrimitives'
 
 type Transaction = {
@@ -289,55 +290,53 @@ export default function FinancePage() {
   )
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-4 p-4 lg:p-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <Wallet className="h-6 w-6 text-emerald-600" />
-            Финансы
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Касса, расходы, расчёты с клиентами и сотрудниками
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={refresh} disabled={refreshing}>
-            {refreshing ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-1 h-4 w-4" />
-            )}
-            Обновить
-          </Button>
-          <Button variant="outline" size="sm" onClick={exportCsv}>
-            <Download className="mr-1 h-4 w-4" />
-            CSV
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              setTxType('INCOME')
-              setTxCategory('SALES')
-              setTxModalOpen(true)
-            }}
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            Поступление
-          </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => {
-              setTxType('EXPENSE')
-              setTxCategory('SUPPLIES')
-              setTxModalOpen(true)
-            }}
-          >
-            <Minus className="mr-1 h-4 w-4" />
-            Расход
-          </Button>
-        </div>
-      </header>
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
+      <PosPageHeader
+        title="Финансы"
+        backHref="/pos/dashboard"
+        icon={<Wallet className="h-4 w-4 text-emerald-600" />}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={refresh} disabled={refreshing}>
+              {refreshing ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-1 h-4 w-4" />
+              )}
+              Обновить
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download className="mr-1 h-4 w-4" />
+              CSV
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setTxType('INCOME')
+                setTxCategory('SALES')
+                setTxModalOpen(true)
+              }}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Поступление
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => {
+                setTxType('EXPENSE')
+                setTxCategory('SUPPLIES')
+                setTxModalOpen(true)
+              }}
+            >
+              <Minus className="mr-1 h-4 w-4" />
+              Расход
+            </Button>
+          </>
+        }
+      />
+
+      <main className="space-y-4 p-4 lg:p-6">
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -726,6 +725,7 @@ export default function FinancePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </main>
     </div>
   )
 }

@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type Stats = {
   successfulOrders: number
@@ -90,26 +91,24 @@ export default function StatisticsPage() {
       : 0
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-4 p-4 lg:p-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <BarChart3 className="h-6 w-6 text-amber-600" />
-            Статистика
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Полный срез по заказам, оплатам, клиентам и меню
-          </p>
-        </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-          {loading ? (
-            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="mr-1 h-4 w-4" />
-          )}
-          Обновить
-        </Button>
-      </header>
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
+      <PosPageHeader
+        title="Статистика"
+        backHref="/pos/dashboard"
+        icon={<BarChart3 className="h-4 w-4 text-amber-600" />}
+        actions={
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            {loading ? (
+              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-1 h-4 w-4" />
+            )}
+            Обновить
+          </Button>
+        }
+      />
+
+      <main className="space-y-4 p-4 lg:p-6">
 
       {/* Headline KPIs */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -271,6 +270,7 @@ export default function StatisticsPage() {
           </div>
         </CardContent>
       </Card>
+      </main>
     </div>
   )
 }

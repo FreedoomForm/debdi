@@ -46,6 +46,7 @@ import { formatCurrency } from '@/lib/pos'
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type OrderStatus =
   | 'NEW'
@@ -196,38 +197,36 @@ export default function DeliveryOrdersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-4 p-4 lg:p-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <Truck className="h-6 w-6 text-indigo-600" />
-            Доставка
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Заказы дня, статусы, курьеры — обновление каждые 20 сек
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
-            {loading ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-1 h-4 w-4" />
-            )}
-            Обновить
-          </Button>
-          <Button variant="outline" size="sm" onClick={exportCsv}>
-            <Download className="mr-1 h-4 w-4" />
-            CSV
-          </Button>
-          <Button size="sm" asChild variant="outline">
-            <a href="/pos/delivery/map">
-              <MapPin className="mr-1 h-4 w-4" />
-              Лайв-карта
-            </a>
-          </Button>
-        </div>
-      </header>
+    <div className="min-h-[calc(100vh-3rem)] bg-background">
+      <PosPageHeader
+        title="Доставка"
+        backHref="/pos/dashboard"
+        icon={<Truck className="h-4 w-4 text-indigo-600" />}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
+              {loading ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-1 h-4 w-4" />
+              )}
+              Обновить
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download className="mr-1 h-4 w-4" />
+              CSV
+            </Button>
+            <Button size="sm" asChild variant="outline">
+              <a href="/pos/delivery/map">
+                <MapPin className="mr-1 h-4 w-4" />
+                Лайв-карта
+              </a>
+            </Button>
+          </>
+        }
+      />
+
+      <main className="space-y-4 p-4 lg:p-6">
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -407,6 +406,7 @@ export default function DeliveryOrdersPage() {
           </Table>
         </CardContent>
       </Card>
+      </main>
     </div>
   )
 }

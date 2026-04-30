@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog'
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 type Participant = {
   id: string
@@ -202,36 +203,32 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="mx-auto h-[calc(100vh-3rem)] max-w-[1400px] space-y-3 p-3 lg:p-4">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <MessageSquare className="h-6 w-6 text-cyan-600" />
-            Чат
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Внутренний мессенджер — обновление каждые 8 сек
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => refreshConversations()}>
-            <RefreshCw className="mr-1 h-4 w-4" />
-            Обновить
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              loadUsers()
-              setPickerOpen(true)
-            }}
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            Новый диалог
-          </Button>
-        </div>
-      </header>
+    <div className="flex min-h-[calc(100vh-3rem)] flex-col bg-background">
+      <PosPageHeader
+        title="Чат"
+        backHref="/pos/dashboard"
+        icon={<MessageSquare className="h-4 w-4 text-cyan-600" />}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={() => refreshConversations()}>
+              <RefreshCw className="mr-1 h-4 w-4" />
+              Обновить
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                loadUsers()
+                setPickerOpen(true)
+              }}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Новый диалог
+            </Button>
+          </>
+        }
+      />
 
-      <div className="grid h-[calc(100%-3.5rem)] grid-cols-1 gap-3 lg:grid-cols-[320px_1fr]">
+      <div className="grid flex-1 grid-cols-1 gap-3 overflow-hidden p-3 lg:grid-cols-[320px_1fr] lg:p-4">
         {/* Conversation list */}
         <Card className="flex h-full flex-col">
           <div className="border-b border-border p-2">
