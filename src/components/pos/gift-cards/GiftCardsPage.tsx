@@ -17,6 +17,8 @@ import {
   Loader2,
   Plus,
   X,
+  Power,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -68,6 +70,52 @@ export function GiftCardsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState({ ...EMPTY })
   const [busy, setBusy] = useState(false)
+  const [rowBusyCode, setRowBusyCode] = useState<string | null>(null)
+
+  const toggleActive = async (card: { code: string; isActive: boolean }) => {
+    setRowBusyCode(card.code)
+    try {
+      const res = await fetch(`/api/pos/gift-cards/${encodeURIComponent(card.code)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: !card.isActive }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success(card.isActive ? 'Карта заблокирована' : 'Карта активирована')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyCode(null)
+    }
+  }
+
+  const deleteCard = async (card: { code: string }) => {
+    const ok =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm(`Удалить карту ${card.code}?`)
+    if (!ok) return
+    setRowBusyCode(card.code)
+    try {
+      const res = await fetch(`/api/pos/gift-cards/${encodeURIComponent(card.code)}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Карта удалена')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyCode(null)
+    }
+  }
 
   const load = useCallback(async () => {
     try {
@@ -269,6 +317,33 @@ export function GiftCardsPage() {
                           : 'Заблок.'}
                     </Badge>
                   </footer>
+
+                  <div className="flex flex-wrap items-center gap-1 border-t border-border bg-card/30 px-3 py-2">
+                    <Button
+                      size="sm"
+                      variant={c.isActive ? 'secondary' : 'default'}
+                      className="h-7 px-2 text-xs"
+                      onClick={() => toggleActive(c)}
+                      disabled={rowBusyCode === c.code}
+                    >
+                      {rowBusyCode === c.code ? (
+                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                      ) : (
+                        <Power className="mr-1 h-3 w-3" />
+                      )}
+                      {c.isActive ? 'Заблокировать' : 'Разблокировать'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                      onClick={() => deleteCard(c)}
+                      disabled={rowBusyCode === c.code}
+                    >
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      Удалить
+                    </Button>
+                  </div>
                 </article>
               )
             })}
