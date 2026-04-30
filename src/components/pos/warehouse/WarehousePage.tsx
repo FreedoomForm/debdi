@@ -21,6 +21,8 @@ import {
   Plus,
   Trash2,
   ShoppingCart,
+  CheckCircle2,
+  PencilLine,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,6 +42,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -49,6 +52,7 @@ import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { RefreshButton } from '@/components/pos/shared/RefreshButton'
+import { Textarea } from '@/components/ui/textarea'
 
 type Ingredient = {
   id: string
@@ -71,8 +75,11 @@ type Dish = {
 type SetItem = {
   id: string
   name: string
-  description?: string
+  description?: string | null
   caloriesTarget?: number | null
+  isActive?: boolean
+  updatedAt?: string
+  calorieGroups?: Record<string, unknown>
 }
 
 type CookingPlanItem = {
@@ -107,6 +114,15 @@ export default function WarehousePage() {
     [{ name: '', amount: '', costPerUnit: '' }]
   )
   const [submitting, setSubmitting] = useState(false)
+
+  // Sets management state (create / edit / activate / delete) — ported
+  // from the legacy SetsTab so users no longer need to bounce back to
+  // /middle-admin?tab=warehouse just to create a set.
+  const [setEditorOpen, setSetEditorOpen] = useState(false)
+  const [editingSet, setEditingSet] = useState<SetItem | null>(null)
+  const [setForm, setSetForm] = useState({ name: '', description: '' })
+  const [savingSet, setSavingSet] = useState(false)
+  const [mutatingSetId, setMutatingSetId] = useState<string | null>(null)
 
   const loadInventory = useCallback(async () => {
     try {
@@ -198,6 +214,125 @@ export default function WarehousePage() {
       (d) => d.name.toLowerCase().includes(q) || (d.category ?? '').toLowerCase().includes(q)
     )
   }, [dishes, search])
+
+  const filteredSets = useMemo(() => {
+    if (!search) return sets
+    const q = search.toLowerCase()
+    return sets.filter(
+      (s) =>
+        s.name.toLowerCase().includes(q) ||
+        (s.description ?? '').toLowerCase().includes(q)
+    )
+  }, [sets, search])
+
+  const openCreateSet = () => {
+    setEditingSet(null)
+    setSetForm({ name: '', description: '' })
+    setSetEditorOpen(true)
+  }
+
+  const openEditSet = (set: SetItem) => {
+    setEditingSet(set)
+    setSetForm({ name: set.name, description: set.description ?? '' })
+    setSetEditorOpen(true)
+  }
+
+  const saveSetMeta = async () => {
+    const name = setForm.name.trim()
+    if (!name) {
+      toast.error('Введите название сета')
+      return
+    }
+    setSavingSet(true)
+    try {
+      const res = await fetch(
+        editingSet ? `/api/admin/sets/${editingSet.id}` : '/api/admin/sets',
+        {
+          method: editingSet ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name,
+            description: setForm.description.trim(),
+          }),
+        }
+      )
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось сохранить сет')
+      }
+      toast.success(editingSet ? 'Сет обновлён' : 'Сет создан')
+      setSetEditorOpen(false)
+      setEditingSet(null)
+      setSetForm({ name: '', description: '' })
+      await loadSets()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setSavingSet(false)
+    }
+  }
+
+  const toggleSetActive = async (set: SetItem) => {
+    setMutatingSetId(set.id)
+    try {
+      const res = await fetch(`/api/admin/sets/${set.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: !set.isActive }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось изменить статус')
+      }
+      toast.success(!set.isActive ? 'Сет активирован' : 'Сет деактивирован')
+      await loadSets()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setMutatingSetId(null)
+    }
+  }
+
+  const deleteSet = async (set: SetItem) => {
+    const ok =
+      typeof window === 'undefined' ? true : window.confirm(`Удалить сет «${set.name}»?`)
+    if (!ok) return
+    setMutatingSetId(set.id)
+    try {
+      const res = await fetch(`/api/admin/sets/${set.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось удалить сет')
+      }
+      toast.success('Сет удалён')
+      await loadSets()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setMutatingSetId(null)
+    }
+  }
+
+  const getSetStats = (set: SetItem) => {
+    const groups =
+      set.calorieGroups && typeof set.calorieGroups === 'object'
+        ? (set.calorieGroups as Record<string, unknown>)
+        : {}
+    const dayEntries = Object.entries(groups).filter(
+      ([key, value]) => key !== '_meta' && Array.isArray(value)
+    )
+    const dayCount = dayEntries.length
+    const groupCount = dayEntries.reduce(
+      (sum, [, value]) => sum + (Array.isArray(value) ? value.length : 0),
+      0
+    )
+    return { dayCount, groupCount }
+  }
 
   // Buy ingredients
   const updateBuyItem = (idx: number, field: 'name' | 'amount' | 'costPerUnit', value: string) => {
@@ -421,32 +556,125 @@ export default function WarehousePage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="sets">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sets.length === 0 ? (
-              <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
-                Сеты не настроены
+        <TabsContent value="sets" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base font-semibold">Меню-сеты</h2>
+              <p className="text-sm text-muted-foreground">
+                Создание, редактирование и активация сетов прямо в новом UI.
               </p>
+            </div>
+            <Button size="sm" onClick={openCreateSet}>
+              <Plus className="mr-1 h-4 w-4" />
+              Новый сет
+            </Button>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredSets.length === 0 ? (
+              <Card className="col-span-full border-dashed">
+                <CardContent className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+                  <Layers className="h-8 w-8 text-muted-foreground" />
+                  <div>
+                    <div className="font-medium">Сеты не настроены</div>
+                    <p className="text-sm text-muted-foreground">
+                      Создайте первый сет, чтобы распределять блюда по дням и активировать рацион.
+                    </p>
+                  </div>
+                  <Button size="sm" onClick={openCreateSet}>
+                    <Plus className="mr-1 h-4 w-4" /> Создать сет
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
-              sets.map((s) => (
-                <Card key={s.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <h3 className="truncate font-semibold">{s.name}</h3>
-                        {s.description && (
-                          <p className="line-clamp-2 text-xs text-muted-foreground">{s.description}</p>
+              filteredSets.map((s) => {
+                const meta = getSetStats(s)
+                const busy = mutatingSetId === s.id
+                return (
+                  <Card
+                    key={s.id}
+                    className={cn(s.isActive && 'border-emerald-300 bg-emerald-50/30')}
+                  >
+                    <CardContent className="space-y-4 p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="truncate font-semibold">{s.name}</h3>
+                            {s.isActive && (
+                              <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
+                                Активный
+                              </Badge>
+                            )}
+                          </div>
+                          {s.description ? (
+                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                              {s.description}
+                            </p>
+                          ) : (
+                            <p className="mt-1 text-xs text-muted-foreground">Без описания</p>
+                          )}
+                        </div>
+                        {s.caloriesTarget != null && (
+                          <Badge variant="secondary" className="shrink-0">
+                            {s.caloriesTarget} ккал
+                          </Badge>
                         )}
                       </div>
-                      {s.caloriesTarget != null && (
-                        <Badge variant="secondary" className="shrink-0">
-                          {s.caloriesTarget} ккал
-                        </Badge>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2">
+                          <div className="text-muted-foreground">Дней</div>
+                          <div className="mt-1 font-semibold tabular-nums">{meta.dayCount}</div>
+                        </div>
+                        <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2">
+                          <div className="text-muted-foreground">Групп</div>
+                          <div className="mt-1 font-semibold tabular-nums">{meta.groupCount}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant={s.isActive ? 'secondary' : 'default'}
+                          onClick={() => toggleSetActive(s)}
+                          disabled={busy}
+                        >
+                          {busy ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="mr-1 h-4 w-4" />
+                          )}
+                          {s.isActive ? 'Деактивировать' : 'Сделать активным'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openEditSet(s)}
+                          disabled={busy}
+                        >
+                          <PencilLine className="mr-1 h-4 w-4" />
+                          Изменить
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => deleteSet(s)}
+                          disabled={busy}
+                        >
+                          <Trash2 className="mr-1 h-4 w-4" />
+                          Удалить
+                        </Button>
+                      </div>
+
+                      {s.updatedAt && (
+                        <p className="text-[11px] text-muted-foreground">
+                          Обновлено: {new Date(s.updatedAt).toLocaleString('ru-RU')}
+                        </p>
                       )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+                    </CardContent>
+                  </Card>
+                )
+              })
             )}
           </div>
         </TabsContent>
@@ -492,6 +720,55 @@ export default function WarehousePage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={setEditorOpen} onOpenChange={setSetEditorOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingSet ? 'Редактировать сет' : 'Новый сет'}</DialogTitle>
+            <DialogDescription>
+              Используется в плане готовки, складе и клиентских меню.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Название</Label>
+              <Input
+                value={setForm.name}
+                onChange={(e) =>
+                  setSetForm((prev) => ({ ...prev, name: e.target.value }))
+                }
+                placeholder="Например, Balance 1600"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Описание</Label>
+              <Textarea
+                value={setForm.description}
+                onChange={(e) =>
+                  setSetForm((prev) => ({ ...prev, description: e.target.value }))
+                }
+                placeholder="Короткое описание рациона или назначения сета"
+                className="min-h-[96px]"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSetEditorOpen(false)}>
+              Отмена
+            </Button>
+            <Button onClick={saveSetMeta} disabled={savingSet}>
+              {savingSet ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-1 h-4 w-4" />
+              )}
+              {editingSet ? 'Сохранить' : 'Создать сет'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={buyOpen} onOpenChange={setBuyOpen}>
         <DialogContent className="max-w-2xl">
