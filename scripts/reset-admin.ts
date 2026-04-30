@@ -21,6 +21,7 @@ async function main() {
                 email,
                 name: 'Super Admin (Recovery)',
                 password: hashedPassword,
+                hasPassword: true,
                 role: 'SUPER_ADMIN',
                 isActive: true
             }
@@ -33,6 +34,7 @@ async function main() {
             where: { email },
             data: {
                 password: hashedPassword,
+                hasPassword: true,
                 isActive: true
             }
         })
