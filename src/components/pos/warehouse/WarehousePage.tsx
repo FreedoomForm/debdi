@@ -9,6 +9,7 @@
  * and a quick "Buy ingredients" dialog that posts to /api/admin/finance/buy-ingredients.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   Boxes,
   ChefHat,
@@ -28,7 +29,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
@@ -81,7 +82,16 @@ type CookingPlanItem = {
 }
 
 export default function WarehousePage() {
-  const [active, setActive] = useState<'inventory' | 'cooking' | 'sets' | 'dishes'>('inventory')
+  // Sub-section is driven by the URL ?tab=... param so the left-rail nav
+  // can deep-link directly to /pos/warehouse?tab=cooking etc. — no
+  // duplicate horizontal TabsList inside the page.
+  type ActiveTab = 'inventory' | 'cooking' | 'sets' | 'dishes'
+  const searchParams = useSearchParams()
+  const tabParam = searchParams?.get('tab')
+  const active: ActiveTab =
+    tabParam === 'cooking' || tabParam === 'sets' || tabParam === 'dishes'
+      ? tabParam
+      : 'inventory'
   const [refreshing, setRefreshing] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -298,23 +308,13 @@ export default function WarehousePage() {
         />
       </div>
 
-      <Tabs value={active} onValueChange={(v) => setActive(v as typeof active)}>
-        <TabsList className="w-full justify-start">
-          <TabsTrigger value="inventory">
-            <Boxes className="mr-1 h-3.5 w-3.5" /> Склад
-          </TabsTrigger>
-          <TabsTrigger value="cooking">
-            <ChefHat className="mr-1 h-3.5 w-3.5" /> План готовки
-          </TabsTrigger>
-          <TabsTrigger value="sets">
-            <Layers className="mr-1 h-3.5 w-3.5" /> Сеты
-          </TabsTrigger>
-          <TabsTrigger value="dishes">
-            <Utensils className="mr-1 h-3.5 w-3.5" /> Блюда
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={active}>
+        {/* Horizontal TabsList intentionally removed — sub-section is
+            chosen from the unified left-rail (Каталог → Склад/План/Сеты/Блюда)
+            via ?tab=… deep-links. This eliminates the duplicate header
+            inside the page content area. */}
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <div className="relative flex-1 max-w-md">
             <Filter className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input

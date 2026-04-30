@@ -49,6 +49,7 @@ import {
   Globe,
   CreditCard,
   Trash2,
+  ClipboardCheck,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -189,6 +190,7 @@ export const NAV: NavSection[] = [
     children: [
       { id: 'finance', href: '/pos/finance', label: 'Финансы', icon: Wallet, desc: 'KPI, фильтры, экспорт' },
       { id: 'cash-drawer', href: '/pos/shift', label: 'Кассовый ящик', icon: CreditCard, desc: 'Внесения и изъятия' },
+      { id: 'tip-pool', href: '/pos/tip-pool', label: 'Tip Pool', icon: Wallet, desc: 'Распределение чаевых', badge: 'new' },
       { id: 'tax-rates', href: '/pos/settings?focus=tax', label: 'Ставки налогов', icon: Percent, desc: 'НДС и сервисный сбор' },
       { id: 'reports-fin', href: '/pos/reports', label: 'Финансовые отчёты', icon: BarChart3, desc: 'Прибыль/убыток' },
     ],
@@ -205,6 +207,7 @@ export const NAV: NavSection[] = [
       { id: 'employees', href: '/pos/employees', label: 'Сотрудники', icon: UserCog, desc: 'Роль, зарплата' },
       { id: 'admins', href: '/pos/admins', label: 'Персонал и доступы', icon: ShieldCheck, desc: 'Создание, права, KPI' },
       { id: 'timeclock', href: '/pos/timeclock', label: 'Тайм-трекер', icon: Timer, desc: 'Учёт смен' },
+      { id: 'checklists', href: '/pos/checklists', label: 'Чек-листы смены', icon: ClipboardCheck, desc: 'Открытие/закрытие смены', badge: 'new' },
     ],
   },
   // ─── 10. Settings ───────────────────────────────────────────────────────
