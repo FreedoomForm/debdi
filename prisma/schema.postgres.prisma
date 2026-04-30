@@ -693,23 +693,24 @@ enum ReservationStatus {
 
 // Cashier shift / register session.
 model CashierShift {
-  id            String      @id @default(cuid())
-  cashierId     String // Admin (LOW_ADMIN / WORKER) id
-  registerId    String? // Optional: a physical register identifier
-  openedAt      DateTime    @default(now())
-  closedAt      DateTime?
-  openingFloat  Float       @default(0) // Cash in drawer at start
-  closingCash   Float?
-  expectedCash  Float?
-  cashDelta     Float? // Closing - expected
-  totalSales    Float       @default(0)
-  totalTax      Float       @default(0)
-  totalDiscount Float       @default(0)
-  totalTips     Float       @default(0)
-  ordersCount   Int         @default(0)
-  status        ShiftStatus @default(OPEN)
-  notes         String?
-  payments      Payment[]
+  id              String               @id @default(cuid())
+  cashierId       String // Admin (LOW_ADMIN / WORKER) id
+  registerId      String? // Optional: a physical register identifier
+  openedAt        DateTime             @default(now())
+  closedAt        DateTime?
+  openingFloat    Float                @default(0) // Cash in drawer at start
+  closingCash     Float?
+  expectedCash    Float?
+  cashDelta       Float? // Closing - expected
+  totalSales      Float                @default(0)
+  totalTax        Float                @default(0)
+  totalDiscount   Float                @default(0)
+  totalTips       Float                @default(0)
+  ordersCount     Int                  @default(0)
+  status          ShiftStatus          @default(OPEN)
+  notes           String?
+  payments        Payment[]
+  drawerMovements CashDrawerMovement[]
 
   @@index([cashierId, openedAt])
   @@map("cashier_shifts")
@@ -1033,4 +1034,79 @@ enum PrinterType {
   BAR
   LABEL
   REPORT
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POS EXTENSIONS — Gift cards, employee timeclock
+// ═══════════════════════════════════════════════════════════════════════════
+
+model GiftCard {
+  id            String               @id @default(cuid())
+  ownerAdminId  String
+  code          String               @unique
+  initialValue  Float
+  balance       Float
+  currency      String               @default("UZS")
+  issuedToName  String?
+  issuedToPhone String?
+  issuedAt      DateTime             @default(now())
+  expiresAt     DateTime?
+  isActive      Boolean              @default(true)
+  redemptions   GiftCardRedemption[]
+  notes         String?
+
+  @@index([ownerAdminId])
+  @@map("gift_cards")
+}
+
+model GiftCardRedemption {
+  id          String   @id @default(cuid())
+  giftCardId  String
+  giftCard    GiftCard @relation(fields: [giftCardId], references: [id], onDelete: Cascade)
+  orderId     String?
+  amount      Float
+  performedBy String?
+  createdAt   DateTime @default(now())
+
+  @@index([giftCardId, createdAt])
+  @@map("gift_card_redemptions")
+}
+
+model TimeclockEntry {
+  id           String    @id @default(cuid())
+  employeeId   String // Admin id
+  ownerAdminId String
+  clockedInAt  DateTime
+  clockedOutAt DateTime?
+  breakMinutes Int       @default(0)
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  @@index([employeeId, clockedInAt])
+  @@index([ownerAdminId])
+  @@map("timeclock_entries")
+}
+
+// Cash drawer movements — manual cash in/out (paid-in, paid-out, drop, change-fund).
+// Linked to a cashier shift so the closing reconciliation can account for them.
+model CashDrawerMovement {
+  id          String             @id @default(cuid())
+  shiftId     String
+  shift       CashierShift       @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  type        CashDrawerMoveType
+  amount      Float // signed: positive = in, negative = out
+  reason      String?
+  performedBy String? // Admin id
+  createdAt   DateTime           @default(now())
+
+  @@index([shiftId, createdAt])
+  @@map("cash_drawer_movements")
+}
+
+enum CashDrawerMoveType {
+  PAID_IN // cash added (e.g. tips, manual top-up)
+  PAID_OUT // cash removed (e.g. petty expense, supplier paid in cash)
+  DROP // cash sent to safe / deposit
+  CHANGE_FUND // change brought in
+  ADJUSTMENT // manual reconciliation
 }
