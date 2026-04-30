@@ -61,6 +61,9 @@ type Ingredient = {
   amount: number
   minAmount?: number | null
   costPerUnit?: number | null
+  pricePerUnit?: number | null
+  priceUnit?: string | null
+  kcalPerGram?: number | null
   updatedAt?: string
 }
 
@@ -123,6 +126,21 @@ export default function WarehousePage() {
   const [setForm, setSetForm] = useState({ name: '', description: '' })
   const [savingSet, setSavingSet] = useState(false)
   const [mutatingSetId, setMutatingSetId] = useState<string | null>(null)
+
+  // Ingredient editor (create / edit) — ports legacy IngredientsManager flow
+  // so users can add/edit raw ingredients without leaving the new UI.
+  const [ingredientEditorOpen, setIngredientEditorOpen] = useState(false)
+  const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null)
+  const [ingredientForm, setIngredientForm] = useState({
+    name: '',
+    amount: '',
+    unit: 'gr',
+    pricePerUnit: '',
+    priceUnit: 'kg',
+    kcalPerGram: '',
+  })
+  const [savingIngredient, setSavingIngredient] = useState(false)
+  const [mutatingIngredientId, setMutatingIngredientId] = useState<string | null>(null)
 
   const loadInventory = useCallback(async () => {
     try {
@@ -214,6 +232,103 @@ export default function WarehousePage() {
       (d) => d.name.toLowerCase().includes(q) || (d.category ?? '').toLowerCase().includes(q)
     )
   }, [dishes, search])
+
+  const openCreateIngredient = () => {
+    setEditingIngredient(null)
+    setIngredientForm({
+      name: '',
+      amount: '',
+      unit: 'gr',
+      pricePerUnit: '',
+      priceUnit: 'kg',
+      kcalPerGram: '',
+    })
+    setIngredientEditorOpen(true)
+  }
+
+  const openEditIngredient = (ing: Ingredient) => {
+    setEditingIngredient(ing)
+    setIngredientForm({
+      name: ing.name,
+      amount: String(ing.amount ?? 0),
+      unit: ing.unit ?? 'gr',
+      pricePerUnit:
+        ing.pricePerUnit != null
+          ? String(ing.pricePerUnit)
+          : ing.costPerUnit != null
+            ? String(ing.costPerUnit)
+            : '',
+      priceUnit: ing.priceUnit ?? 'kg',
+      kcalPerGram: ing.kcalPerGram != null ? String(ing.kcalPerGram) : '',
+    })
+    setIngredientEditorOpen(true)
+  }
+
+  const saveIngredient = async () => {
+    const name = ingredientForm.name.trim()
+    if (!name) {
+      toast.error('Введите название ингредиента')
+      return
+    }
+    const parseNumber = (v: string): number | null => {
+      const n = Number(v)
+      return Number.isFinite(n) && v !== '' ? n : null
+    }
+    const payload: Record<string, unknown> = {
+      name,
+      amount: parseNumber(ingredientForm.amount) ?? 0,
+      unit: ingredientForm.unit || 'gr',
+      pricePerUnit: parseNumber(ingredientForm.pricePerUnit),
+      priceUnit: ingredientForm.priceUnit || 'kg',
+      kcalPerGram: parseNumber(ingredientForm.kcalPerGram),
+    }
+    if (editingIngredient?.id) payload.id = editingIngredient.id
+
+    setSavingIngredient(true)
+    try {
+      const res = await fetch('/api/admin/warehouse/ingredients', {
+        method: editingIngredient ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось сохранить ингредиент')
+      }
+      toast.success(editingIngredient ? 'Ингредиент обновлён' : 'Ингредиент создан')
+      setIngredientEditorOpen(false)
+      setEditingIngredient(null)
+      await loadInventory()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setSavingIngredient(false)
+    }
+  }
+
+  const deleteIngredient = async (ing: Ingredient) => {
+    const ok =
+      typeof window === 'undefined' ? true : window.confirm(`Удалить «${ing.name}»?`)
+    if (!ok) return
+    setMutatingIngredientId(ing.id)
+    try {
+      const res = await fetch(
+        `/api/admin/warehouse/ingredients?id=${encodeURIComponent(ing.id)}`,
+        { method: 'DELETE', credentials: 'include' }
+      )
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось удалить')
+      }
+      toast.success('Ингредиент удалён')
+      await loadInventory()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setMutatingIngredientId(null)
+    }
+  }
 
   const filteredSets = useMemo(() => {
     if (!search) return sets
@@ -453,7 +568,20 @@ export default function WarehousePage() {
           </div>
         </div>
 
-        <TabsContent value="inventory">
+        <TabsContent value="inventory" className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base font-semibold">Ингредиенты</h2>
+              <p className="text-sm text-muted-foreground">
+                Полный CRUD: добавление, редактирование, удаление сырья.
+              </p>
+            </div>
+            <Button size="sm" onClick={openCreateIngredient}>
+              <Plus className="mr-1 h-4 w-4" />
+              Новый ингредиент
+            </Button>
+          </div>
+
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -465,12 +593,13 @@ export default function WarehousePage() {
                     <TableHead className="text-right">Цена/ед.</TableHead>
                     <TableHead className="text-right">Стоимость</TableHead>
                     <TableHead>Статус</TableHead>
+                    <TableHead className="w-24 text-right">Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredInventory.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
+                      <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
                         Нет позиций
                       </TableCell>
                     </TableRow>
@@ -480,6 +609,8 @@ export default function WarehousePage() {
                       .map((i) => {
                         const isLow = i.minAmount != null && i.amount <= i.minAmount
                         const isOut = i.amount <= 0
+                        const unitCost = i.costPerUnit ?? i.pricePerUnit ?? null
+                        const busy = mutatingIngredientId === i.id
                         return (
                           <TableRow key={i.id}>
                             <TableCell className="font-medium">{i.name}</TableCell>
@@ -490,10 +621,10 @@ export default function WarehousePage() {
                               {i.minAmount != null ? `${i.minAmount} ${i.unit}` : '—'}
                             </TableCell>
                             <TableCell className="text-right text-xs tabular-nums">
-                              {i.costPerUnit != null ? formatCurrency(i.costPerUnit, 'UZS') : '—'}
+                              {unitCost != null ? formatCurrency(unitCost, 'UZS') : '—'}
                             </TableCell>
                             <TableCell className="text-right text-xs tabular-nums">
-                              {i.costPerUnit != null ? formatCurrency(i.costPerUnit * i.amount, 'UZS') : '—'}
+                              {unitCost != null ? formatCurrency(unitCost * i.amount, 'UZS') : '—'}
                             </TableCell>
                             <TableCell>
                               {isOut ? (
@@ -509,6 +640,34 @@ export default function WarehousePage() {
                                   В норме
                                 </Badge>
                               )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7"
+                                  onClick={() => openEditIngredient(i)}
+                                  disabled={busy}
+                                  aria-label="Изменить"
+                                >
+                                  <PencilLine className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-7 w-7 text-rose-600 hover:bg-rose-50"
+                                  onClick={() => deleteIngredient(i)}
+                                  disabled={busy}
+                                  aria-label="Удалить"
+                                >
+                                  {busy ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  )}
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )
@@ -720,6 +879,102 @@ export default function WarehousePage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={ingredientEditorOpen} onOpenChange={setIngredientEditorOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingIngredient ? 'Редактировать ингредиент' : 'Новый ингредиент'}
+            </DialogTitle>
+            <DialogDescription>
+              Используется в рецептах блюд, плане готовки и закупках.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Название</Label>
+              <Input
+                value={ingredientForm.name}
+                onChange={(e) =>
+                  setIngredientForm((p) => ({ ...p, name: e.target.value }))
+                }
+                placeholder="Курица грудка"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Остаток</Label>
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={ingredientForm.amount}
+                onChange={(e) =>
+                  setIngredientForm((p) => ({ ...p, amount: e.target.value }))
+                }
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Единица</Label>
+              <Input
+                value={ingredientForm.unit}
+                onChange={(e) =>
+                  setIngredientForm((p) => ({ ...p, unit: e.target.value }))
+                }
+                placeholder="gr / kg / ml / l / pcs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Цена / ед., UZS</Label>
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={ingredientForm.pricePerUnit}
+                onChange={(e) =>
+                  setIngredientForm((p) => ({ ...p, pricePerUnit: e.target.value }))
+                }
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Ед. цены</Label>
+              <Input
+                value={ingredientForm.priceUnit}
+                onChange={(e) =>
+                  setIngredientForm((p) => ({ ...p, priceUnit: e.target.value }))
+                }
+                placeholder="kg"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Калорийность, ккал/гр</Label>
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={ingredientForm.kcalPerGram}
+                onChange={(e) =>
+                  setIngredientForm((p) => ({ ...p, kcalPerGram: e.target.value }))
+                }
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIngredientEditorOpen(false)}>
+              Отмена
+            </Button>
+            <Button onClick={saveIngredient} disabled={savingIngredient}>
+              {savingIngredient ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-1 h-4 w-4" />
+              )}
+              {editingIngredient ? 'Сохранить' : 'Создать ингредиент'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={setEditorOpen} onOpenChange={setSetEditorOpen}>
         <DialogContent>
