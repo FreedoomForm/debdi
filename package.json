@@ -24,6 +24,7 @@
     "push": "git push",
     "push:unsafe": "prisma db push --accept-data-loss && git push",
     "seed": "tsx prisma/seed.ts",
+    "init-admin": "tsx scripts/reset-admin.ts",
     "tambo:api-catalog": "node scripts/generate-tambo-api-catalog.mjs",
     "tambo:ui-catalog": "node scripts/generate-tambo-ui-catalog.mjs",
     "db:translate-website-content": "tsx scripts/translate-website-content.ts"
