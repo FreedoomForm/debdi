@@ -18,6 +18,9 @@ import {
   Plus,
   Store,
   X,
+  Pencil,
+  Power,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -74,6 +77,7 @@ export function BranchesPage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Partial<Branch> | null>(null)
   const [busy, setBusy] = useState(false)
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -94,25 +98,72 @@ export function BranchesPage() {
     load()
   }, [load])
 
+  const toggleActive = async (b: Branch) => {
+    setRowBusyId(b.id)
+    try {
+      const res = await fetch(`/api/pos/branches/${b.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: !b.isActive }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success(b.isActive ? 'Филиал отключён' : 'Филиал активирован')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const deleteBranch = async (b: Branch) => {
+    const ok =
+      typeof window === 'undefined' ? true : window.confirm(`Удалить «${b.name}»?`)
+    if (!ok) return
+    setRowBusyId(b.id)
+    try {
+      const res = await fetch(`/api/pos/branches/${b.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Филиал удалён')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
   const save = async () => {
     if (!editing?.name?.trim()) return
     setBusy(true)
     try {
-      const res = await fetch('/api/pos/branches', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: editing.name,
-          code: editing.code || null,
-          address: editing.address || null,
-          phone: editing.phone || null,
-          timezone: editing.timezone || 'Asia/Tashkent',
-          currency: editing.currency || 'UZS',
-          taxRate: editing.taxRate ?? 0,
-          isActive: editing.isActive ?? true,
-        }),
-      })
+      const isUpdate = Boolean(editing.id)
+      const res = await fetch(
+        isUpdate ? `/api/pos/branches/${editing.id}` : '/api/pos/branches',
+        {
+          method: isUpdate ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: editing.name,
+            code: editing.code || null,
+            address: editing.address || null,
+            phone: editing.phone || null,
+            timezone: editing.timezone || 'Asia/Tashkent',
+            currency: editing.currency || 'UZS',
+            taxRate: editing.taxRate ?? 0,
+            isActive: editing.isActive ?? true,
+          }),
+        }
+      )
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       toast.success('Сохранено')
       setEditing(null)
@@ -219,6 +270,43 @@ export function BranchesPage() {
                     </div>
                   </div>
                 </dl>
+
+                <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-border pt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setEditing({ ...b })}
+                    disabled={rowBusyId === b.id}
+                  >
+                    <Pencil className="mr-1 h-3 w-3" />
+                    Изменить
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={b.isActive ? 'secondary' : 'default'}
+                    className="h-7 px-2 text-xs"
+                    onClick={() => toggleActive(b)}
+                    disabled={rowBusyId === b.id}
+                  >
+                    {rowBusyId === b.id ? (
+                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                    ) : (
+                      <Power className="mr-1 h-3 w-3" />
+                    )}
+                    {b.isActive ? 'Откл.' : 'Вкл.'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                    onClick={() => deleteBranch(b)}
+                    disabled={rowBusyId === b.id}
+                  >
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    Удалить
+                  </Button>
+                </div>
               </article>
             ))}
           </div>
@@ -228,7 +316,9 @@ export function BranchesPage() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
-            <DialogTitle>Новый филиал</DialogTitle>
+            <DialogTitle>
+              {editing?.id ? 'Редактировать филиал' : 'Новый филиал'}
+            </DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="grid gap-3 sm:grid-cols-2">
