@@ -70,10 +70,28 @@ type Ingredient = {
 type Dish = {
   id: string
   name: string
+  description?: string | null
   category?: string
+  mealType?: string
   ingredients?: Array<{ name: string; amount: number; unit: string }>
   caloriesPerPortion?: number | null
 }
+
+type DishIngredient = { name: string; amount: string; unit: string }
+
+const MEAL_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'BREAKFAST', label: 'Завтрак' },
+  { value: 'SECOND_BREAKFAST', label: '2-й завтрак' },
+  { value: 'LUNCH', label: 'Обед' },
+  { value: 'SNACK', label: 'Перекус' },
+  { value: 'DINNER', label: 'Ужин' },
+  { value: 'SIXTH_MEAL', label: '6-й приём' },
+]
+
+const MEAL_TYPE_LABELS: Record<string, string> = MEAL_TYPE_OPTIONS.reduce(
+  (acc, item) => ({ ...acc, [item.value]: item.label }),
+  {} as Record<string, string>
+)
 
 type SetItem = {
   id: string
@@ -141,6 +159,19 @@ export default function WarehousePage() {
   })
   const [savingIngredient, setSavingIngredient] = useState(false)
   const [mutatingIngredientId, setMutatingIngredientId] = useState<string | null>(null)
+
+  // Dish editor (create / edit recipe with ingredients) — ports legacy
+  // DishesManager flow into the new POS warehouse page.
+  const [dishEditorOpen, setDishEditorOpen] = useState(false)
+  const [editingDish, setEditingDish] = useState<Dish | null>(null)
+  const [dishForm, setDishForm] = useState<{
+    name: string
+    description: string
+    mealType: string
+    ingredients: DishIngredient[]
+  }>({ name: '', description: '', mealType: 'LUNCH', ingredients: [] })
+  const [savingDish, setSavingDish] = useState(false)
+  const [mutatingDishId, setMutatingDishId] = useState<string | null>(null)
 
   const loadInventory = useCallback(async () => {
     try {
@@ -327,6 +358,135 @@ export default function WarehousePage() {
       toast.error(err instanceof Error ? err.message : 'Ошибка')
     } finally {
       setMutatingIngredientId(null)
+    }
+  }
+
+  const openCreateDish = () => {
+    setEditingDish(null)
+    setDishForm({
+      name: '',
+      description: '',
+      mealType: 'LUNCH',
+      ingredients: [{ name: '', amount: '', unit: 'gr' }],
+    })
+    setDishEditorOpen(true)
+  }
+
+  const openEditDish = (dish: Dish) => {
+    setEditingDish(dish)
+    setDishForm({
+      name: dish.name,
+      description: dish.description ?? '',
+      mealType: dish.mealType ?? 'LUNCH',
+      ingredients:
+        Array.isArray(dish.ingredients) && dish.ingredients.length > 0
+          ? dish.ingredients.map((ing) => ({
+              name: ing.name,
+              amount: String(ing.amount ?? ''),
+              unit: ing.unit ?? 'gr',
+            }))
+          : [{ name: '', amount: '', unit: 'gr' }],
+    })
+    setDishEditorOpen(true)
+  }
+
+  const updateDishIngredient = (
+    idx: number,
+    field: keyof DishIngredient,
+    value: string
+  ) => {
+    setDishForm((prev) => ({
+      ...prev,
+      ingredients: prev.ingredients.map((ing, i) =>
+        i === idx ? { ...ing, [field]: value } : ing
+      ),
+    }))
+  }
+
+  const addDishIngredientRow = () =>
+    setDishForm((prev) => ({
+      ...prev,
+      ingredients: [...prev.ingredients, { name: '', amount: '', unit: 'gr' }],
+    }))
+
+  const removeDishIngredientRow = (idx: number) =>
+    setDishForm((prev) => ({
+      ...prev,
+      ingredients:
+        prev.ingredients.length > 1
+          ? prev.ingredients.filter((_, i) => i !== idx)
+          : prev.ingredients,
+    }))
+
+  const saveDish = async () => {
+    const name = dishForm.name.trim()
+    if (!name) {
+      toast.error('Введите название блюда')
+      return
+    }
+    if (!dishForm.mealType) {
+      toast.error('Выберите тип приёма пищи')
+      return
+    }
+    const cleanedIngredients = dishForm.ingredients
+      .map((ing) => ({
+        name: ing.name.trim(),
+        amount: Number(ing.amount),
+        unit: (ing.unit || 'gr').trim() || 'gr',
+      }))
+      .filter((ing) => ing.name && Number.isFinite(ing.amount) && ing.amount > 0)
+
+    const payload: Record<string, unknown> = {
+      name,
+      description: dishForm.description.trim(),
+      mealType: dishForm.mealType,
+      ingredients: cleanedIngredients,
+    }
+    if (editingDish?.id) payload.id = editingDish.id
+
+    setSavingDish(true)
+    try {
+      const res = await fetch('/api/admin/warehouse/dishes', {
+        method: editingDish ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось сохранить блюдо')
+      }
+      toast.success(editingDish ? 'Блюдо обновлено' : 'Блюдо создано')
+      setDishEditorOpen(false)
+      setEditingDish(null)
+      await loadDishes()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setSavingDish(false)
+    }
+  }
+
+  const deleteDish = async (dish: Dish) => {
+    const ok =
+      typeof window === 'undefined' ? true : window.confirm(`Удалить блюдо «${dish.name}»?`)
+    if (!ok) return
+    setMutatingDishId(dish.id)
+    try {
+      const res = await fetch(
+        `/api/admin/warehouse/dishes?id=${encodeURIComponent(dish.id)}`,
+        { method: 'DELETE', credentials: 'include' }
+      )
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Не удалось удалить блюдо')
+      }
+      toast.success('Блюдо удалено')
+      await loadDishes()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Ошибка')
+    } finally {
+      setMutatingDishId(null)
     }
   }
 
@@ -838,40 +998,95 @@ export default function WarehousePage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="dishes">
+        <TabsContent value="dishes" className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base font-semibold">Блюда</h2>
+              <p className="text-sm text-muted-foreground">
+                Полный CRUD: создание рецептов, редактирование, удаление.
+              </p>
+            </div>
+            <Button size="sm" onClick={openCreateDish}>
+              <Plus className="mr-1 h-4 w-4" />
+              Новое блюдо
+            </Button>
+          </div>
+
           <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Блюдо</TableHead>
-                    <TableHead>Категория</TableHead>
+                    <TableHead>Тип</TableHead>
                     <TableHead className="text-right">Калории</TableHead>
                     <TableHead className="text-right">Ингредиентов</TableHead>
+                    <TableHead className="w-24 text-right">Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredDishes.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="py-10 text-center text-sm text-muted-foreground">
+                      <TableCell colSpan={5} className="py-10 text-center text-sm text-muted-foreground">
                         Нет блюд
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredDishes.map((d) => (
-                      <TableRow key={d.id}>
-                        <TableCell className="font-medium">{d.name}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground">
-                          {d.category ?? '—'}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {d.caloriesPerPortion ?? '—'}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {d.ingredients?.length ?? 0}
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    filteredDishes.map((d) => {
+                      const busy = mutatingDishId === d.id
+                      const mealLabel = d.mealType
+                        ? MEAL_TYPE_LABELS[d.mealType] ?? d.mealType
+                        : d.category ?? '—'
+                      return (
+                        <TableRow key={d.id}>
+                          <TableCell className="font-medium">
+                            <div>{d.name}</div>
+                            {d.description && (
+                              <div className="line-clamp-1 text-[11px] text-muted-foreground">
+                                {d.description}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            {mealLabel}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {d.caloriesPerPortion ?? '—'}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {d.ingredients?.length ?? 0}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7"
+                                onClick={() => openEditDish(d)}
+                                disabled={busy}
+                                aria-label="Изменить"
+                              >
+                                <PencilLine className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-rose-600 hover:bg-rose-50"
+                                onClick={() => deleteDish(d)}
+                                disabled={busy}
+                                aria-label="Удалить"
+                              >
+                                {busy ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                )}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -879,6 +1094,121 @@ export default function WarehousePage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={dishEditorOpen} onOpenChange={setDishEditorOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingDish ? 'Редактировать блюдо' : 'Новое блюдо'}</DialogTitle>
+            <DialogDescription>
+              Настройте название, тип приёма пищи и состав ингредиентов.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Label className="text-xs">Название</Label>
+                <Input
+                  value={dishForm.name}
+                  onChange={(e) => setDishForm((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="Например, Куриная грудка с овощами"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Тип приёма</Label>
+                <select
+                  value={dishForm.mealType}
+                  onChange={(e) =>
+                    setDishForm((p) => ({ ...p, mealType: e.target.value }))
+                  }
+                  className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
+                >
+                  {MEAL_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label className="text-xs">Описание</Label>
+                <Input
+                  value={dishForm.description}
+                  onChange={(e) =>
+                    setDishForm((p) => ({ ...p, description: e.target.value }))
+                  }
+                  placeholder="Краткое описание (необязательно)"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs">Состав</Label>
+                <Button variant="outline" size="sm" onClick={addDishIngredientRow}>
+                  <Plus className="mr-1 h-3.5 w-3.5" />
+                  Ингредиент
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                {dishForm.ingredients.map((ing, idx) => (
+                  <div key={idx} className="grid grid-cols-12 items-end gap-2">
+                    <div className="col-span-6">
+                      <Input
+                        value={ing.name}
+                        onChange={(e) => updateDishIngredient(idx, 'name', e.target.value)}
+                        placeholder="Название"
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        value={ing.amount}
+                        onChange={(e) => updateDishIngredient(idx, 'amount', e.target.value)}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Input
+                        value={ing.unit}
+                        onChange={(e) => updateDishIngredient(idx, 'unit', e.target.value)}
+                        placeholder="gr"
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removeDishIngredientRow(idx)}
+                        disabled={dishForm.ingredients.length <= 1}
+                        aria-label="Удалить строку"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDishEditorOpen(false)}>
+              Отмена
+            </Button>
+            <Button onClick={saveDish} disabled={savingDish}>
+              {savingDish ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-1 h-4 w-4" />
+              )}
+              {editingDish ? 'Сохранить' : 'Создать блюдо'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={ingredientEditorOpen} onOpenChange={setIngredientEditorOpen}>
         <DialogContent>
