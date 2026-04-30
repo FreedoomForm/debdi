@@ -18,6 +18,9 @@ import {
   Loader2,
   Search,
   Sparkles,
+  Coins,
+  Users,
+  Wallet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,6 +37,7 @@ import {
 import { formatCurrency, formatDateTime } from '@/lib/pos'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { RefreshButton } from '@/components/pos/shared/RefreshButton'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Program = {
   id: string
@@ -112,6 +116,26 @@ export function LoyaltyPage() {
     )
   }, [members, query])
 
+  // Aggregate KPIs that the legacy admin loyalty view exposes.
+  const stats = useMemo(() => {
+    const totalPoints = members.reduce((sum, m) => sum + (m.points ?? 0), 0)
+    const totalSpent = members.reduce(
+      (sum, m) => sum + (m.lifetimeSpent ?? 0),
+      0
+    )
+    const tierCounts = members.reduce<Record<string, number>>((acc, m) => {
+      const tier = (m.tier ?? '').trim() || '—'
+      acc[tier] = (acc[tier] ?? 0) + 1
+      return acc
+    }, {})
+    return {
+      totalPoints,
+      totalSpent,
+      activeMembers: members.length,
+      uniqueTiers: Object.keys(tierCounts).filter((t) => t !== '—').length,
+    }
+  }, [members])
+
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-background">
       <PosPageHeader
@@ -144,6 +168,41 @@ export function LoyaltyPage() {
           </div>
         ) : (
           <>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <KpiTile
+                label="Участников"
+                value={String(stats.activeMembers)}
+                icon={<Users className="h-4 w-4" />}
+                tone="cyan"
+                hint="В программе лояльности"
+              />
+              <KpiTile
+                label="Баллов в обороте"
+                value={stats.totalPoints.toLocaleString('ru-RU')}
+                icon={<Coins className="h-4 w-4" />}
+                tone="amber"
+                hint="Сумма всех начисленных баллов"
+              />
+              <KpiTile
+                label="Потрачено клиентами"
+                value={formatCurrency(stats.totalSpent, 'UZS')}
+                icon={<Wallet className="h-4 w-4" />}
+                tone="emerald"
+                hint="Lifetime сумма по участникам"
+              />
+              <KpiTile
+                label="Уровней"
+                value={String(stats.uniqueTiers)}
+                icon={<Award className="h-4 w-4" />}
+                tone={stats.uniqueTiers > 0 ? 'violet' : 'neutral'}
+                hint={
+                  stats.uniqueTiers > 0
+                    ? 'Уникальных tier у участников'
+                    : 'Tier не настроены'
+                }
+              />
+            </div>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
