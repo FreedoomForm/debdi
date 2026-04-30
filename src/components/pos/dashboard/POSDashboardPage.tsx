@@ -48,6 +48,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
+import { LiveStrip } from './LiveStrip'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -280,6 +281,7 @@ export function POSDashboardPage() {
       </header>
 
       <main className="mx-auto max-w-7xl space-y-5 px-4 py-5">
+        <LiveStrip />
         {/* KPI grid */}
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Kpi
