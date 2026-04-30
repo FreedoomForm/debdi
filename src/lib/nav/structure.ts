@@ -85,6 +85,8 @@ export const NAV: NavSection[] = [
     children: [
       { id: 'overview', href: '/pos/dashboard', label: 'Дашборд', icon: LayoutDashboard, desc: 'Общая сводка дня' },
       { id: 'reports-sales', href: '/pos/reports', label: 'Отчёты продаж', icon: BarChart3, desc: 'Выручка, чеки, тренды' },
+      { id: 'statistics-new', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории', badge: 'new' },
+      { id: 'statistics-legacy', href: '/middle-admin?tab=statistics', label: 'Статистика (старая)', icon: BarChart3, desc: 'Легаси-вид' },
       { id: 'live-status', href: '/pos/dashboard?focus=live', label: 'Лайв-статус', icon: TrendingUp, desc: 'Что происходит сейчас', badge: 'live' },
       { id: 'history', href: '/middle-admin?tab=history', label: 'Журнал действий', icon: History, desc: 'Аудит-лог' },
     ],
