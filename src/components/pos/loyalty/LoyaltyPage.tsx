@@ -16,7 +16,6 @@ import {
   ArrowLeft,
   Award,
   Loader2,
-  RefreshCw,
   Search,
   Sparkles,
 } from 'lucide-react'
@@ -34,6 +33,7 @@ import {
 } from '@/components/ui/card'
 import { formatCurrency, formatDateTime } from '@/lib/pos'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type Program = {
   id: string
@@ -133,9 +133,7 @@ export function LoyaltyPage() {
           ) : undefined
         }
         actions={
-          <Button size="icon" variant="ghost" onClick={() => load()}>
-            <RefreshCw className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
-          </Button>
+          <RefreshButton onClick={() => load()} loading={loading} variant="ghost" size="icon" label={null} />
         }
       />
 

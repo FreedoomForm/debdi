@@ -16,7 +16,6 @@ import {
   Gift,
   Loader2,
   Plus,
-  RefreshCw,
   X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -38,6 +37,7 @@ import {
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { formatCurrency, formatDateTime } from '@/lib/pos'
 
 type GiftCard = {
@@ -136,10 +136,7 @@ export function GiftCardsPage() {
         badge={items.length}
         actions={
           <>
-            <Button size="sm" variant="outline" onClick={load}>
-              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
             <Button size="sm" onClick={() => setCreateOpen(true)}>
               <Plus className="mr-1.5 h-3.5 w-3.5" />
               Выпустить

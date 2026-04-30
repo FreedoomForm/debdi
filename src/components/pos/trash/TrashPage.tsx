@@ -17,7 +17,6 @@ import { toast } from 'sonner'
 import {
   ArrowLeft,
   Loader2,
-  RefreshCw,
   RotateCcw,
   Search,
   Trash2,
@@ -42,6 +41,7 @@ import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type BinClient = {
   id: string
@@ -246,10 +246,7 @@ export default function TrashPage() {
         icon={<Trash2 className="h-4 w-4 text-rose-500" />}
         badge={clients.length + orders.length}
         actions={
-          <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-            Обновить
-          </Button>
+          <RefreshButton onClick={load} loading={loading} />
         }
       />
 

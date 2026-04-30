@@ -16,7 +16,6 @@ import {
   Filter,
   History as HistoryIcon,
   Loader2,
-  RefreshCw,
   Search,
   User,
 } from 'lucide-react'
@@ -42,6 +41,7 @@ import {
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type ActionLog = {
   id: string
@@ -171,10 +171,7 @@ export default function HistoryPage() {
         icon={<HistoryIcon className="h-4 w-4 text-amber-500" />}
         badge={total}
         actions={
-          <Button size="sm" variant="outline" onClick={loadLogs} disabled={loading}>
-            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-            Обновить
-          </Button>
+          <RefreshButton onClick={loadLogs} loading={loading} />
         }
       />
 

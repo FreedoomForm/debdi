@@ -19,7 +19,6 @@ import {
   Loader2,
   Package,
   Plus,
-  RefreshCw,
   Search,
   Star,
   Tag,
@@ -49,6 +48,7 @@ import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { Field } from '@/components/pos/shared/FormPrimitives'
 import { formatCurrency, type PosCategory, type PosProduct } from '@/lib/pos'
 
@@ -222,10 +222,7 @@ export function ProductsManagerPage() {
         }
         actions={
           <>
-            <Button size="sm" variant="outline" onClick={load}>
-              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
             <Button size="sm" onClick={startCreate}>
               <Plus className="mr-1.5 h-3.5 w-3.5" />
               Новый товар

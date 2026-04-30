@@ -15,7 +15,6 @@ import {
   Loader2,
   Percent,
   Plus,
-  RefreshCw,
   Tag,
   X,
 } from 'lucide-react'
@@ -46,6 +45,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { formatCurrency, formatDateTime, type PosDiscount } from '@/lib/pos'
 
 const TYPE_LABELS: Record<PosDiscount['type'], string> = {
@@ -130,10 +130,7 @@ export function DiscountsPage() {
         backHref="/pos/terminal"
         actions={
           <>
-            <Button size="sm" variant="outline" onClick={load}>
-              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
             <Button size="sm" onClick={() => setEditing({ ...EMPTY })}>
               <Plus className="mr-1.5 h-3.5 w-3.5" />
               Скидка

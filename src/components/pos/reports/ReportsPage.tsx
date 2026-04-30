@@ -16,7 +16,6 @@ import {
   CreditCard,
   Download,
   Loader2,
-  RefreshCw,
   ShoppingCart,
   TrendingUp,
 } from 'lucide-react'
@@ -35,6 +34,7 @@ import { formatCurrency } from '@/lib/pos'
 import { RevenueTrendChart } from './RevenueTrendChart'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -137,10 +137,7 @@ export function ReportsPage() {
               <Download className="mr-1.5 h-3.5 w-3.5" />
               CSV
             </Button>
-            <Button size="sm" variant="outline" onClick={load}>
-              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
           </>
         }
       />

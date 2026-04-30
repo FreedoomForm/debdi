@@ -16,7 +16,6 @@ import {
   CreditCard,
   Loader2,
   Printer,
-  RefreshCw,
   Receipt as ReceiptIcon,
   RotateCcw,
   Search,
@@ -41,6 +40,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { formatCurrency, formatDateTime, formatTime } from '@/lib/pos'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type OrderItem = {
   id: string
@@ -259,10 +259,7 @@ export function OrdersHistoryPage() {
         backHref="/pos/terminal"
         badge={visible.length}
         actions={
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-            Обновить
-          </Button>
+          <RefreshButton onClick={load} loading={loading} />
         }
       />
 

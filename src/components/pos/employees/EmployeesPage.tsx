@@ -17,7 +17,6 @@ import {
   Pencil,
   Power,
   PowerOff,
-  RefreshCw,
   Search,
   ShieldCheck,
   Trash2,
@@ -47,6 +46,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { formatCurrency } from '@/lib/pos'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 
@@ -296,10 +296,7 @@ export function EmployeesPage() {
               <Plus className="mr-1 h-4 w-4" />
               Добавить
             </Button>
-            <Button size="sm" variant="outline" onClick={load}>
-              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
           </>
         }
       />

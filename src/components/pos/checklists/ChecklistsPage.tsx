@@ -14,7 +14,6 @@ import {
   ClipboardList,
   Loader2,
   Plus,
-  RefreshCw,
   Sun,
   Moon,
   CircleDot,
@@ -41,6 +40,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { Field } from '@/components/pos/shared/FormPrimitives'
 
@@ -265,10 +265,7 @@ export default function ChecklistsPage() {
               <Plus className="mr-1.5 h-3.5 w-3.5" />
               Шаблон
             </Button>
-            <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
           </>
         }
       />
