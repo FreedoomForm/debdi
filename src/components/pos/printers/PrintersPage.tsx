@@ -76,6 +76,7 @@ export function PrintersPage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Partial<PosPrinter> | null>(null)
   const [busy, setBusy] = useState(false)
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null)
   const [testingId, setTestingId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -97,29 +98,99 @@ export function PrintersPage() {
     load()
   }, [load])
 
+  const toggleActive = async (printer: PosPrinter) => {
+    setRowBusyId(printer.id)
+    try {
+      const res = await fetch(`/api/pos/printers/${printer.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: !printer.isActive }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success(printer.isActive ? 'Принтер отключён' : 'Принтер включён')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const setAsDefault = async (printer: PosPrinter) => {
+    setRowBusyId(printer.id)
+    try {
+      const res = await fetch(`/api/pos/printers/${printer.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isDefault: true }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Установлен по умолчанию для этого типа')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const deletePrinter = async (printer: PosPrinter) => {
+    const ok =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm(`Удалить принтер «${printer.name}»?`)
+    if (!ok) return
+    setRowBusyId(printer.id)
+    try {
+      const res = await fetch(`/api/pos/printers/${printer.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Принтер удалён')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
   const save = async () => {
     if (!editing || !editing.name?.trim()) return
     setBusy(true)
     try {
-      const res = await fetch('/api/pos/printers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: editing.name,
-          type: editing.type,
-          connection: editing.connection,
-          ipAddress: editing.ipAddress || null,
-          port: editing.port || 9100,
-          bluetoothMac: editing.bluetoothMac || null,
-          paperWidth: editing.paperWidth ?? '80mm',
-          isDefault: !!editing.isDefault,
-          isActive: editing.isActive ?? true,
-          notes: editing.notes || null,
-        }),
-      })
+      const isUpdate = Boolean(editing.id)
+      const res = await fetch(
+        isUpdate ? `/api/pos/printers/${editing.id}` : '/api/pos/printers',
+        {
+          method: isUpdate ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: editing.name,
+            type: editing.type,
+            connection: editing.connection,
+            ipAddress: editing.ipAddress || null,
+            port: editing.port || 9100,
+            bluetoothMac: editing.bluetoothMac || null,
+            paperWidth: editing.paperWidth ?? '80mm',
+            isDefault: !!editing.isDefault,
+            isActive: editing.isActive ?? true,
+            notes: editing.notes || null,
+          }),
+        }
+      )
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      toast.success('Принтер добавлен')
+      toast.success(isUpdate ? 'Принтер обновлён' : 'Принтер добавлен')
       setEditing(null)
       load()
     } catch (err) {
@@ -266,17 +337,55 @@ export function PrintersPage() {
                       )}
                       Тест печати
                     </Button>
-                    <Button size="sm" variant="ghost" className="px-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="px-2"
+                      onClick={() => setEditing({ ...p })}
+                      disabled={rowBusyId === p.id}
+                      aria-label="Изменить"
+                    >
                       <Edit3 className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
                       className="px-2 text-rose-600 hover:text-rose-700"
+                      onClick={() => deletePrinter(p)}
+                      disabled={rowBusyId === p.id}
+                      aria-label="Удалить"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      {rowBusyId === p.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
                     </Button>
                   </footer>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-1 border-t border-border pt-2">
+                    {!p.isDefault && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setAsDefault(p)}
+                        disabled={rowBusyId === p.id}
+                      >
+                        <Star className="mr-1 h-3 w-3" />
+                        По умолчанию
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant={p.isActive ? 'secondary' : 'default'}
+                      className="h-7 px-2 text-xs"
+                      onClick={() => toggleActive(p)}
+                      disabled={rowBusyId === p.id}
+                    >
+                      {p.isActive ? 'Выкл.' : 'Вкл.'}
+                    </Button>
+                  </div>
                 </article>
               )
             })}
@@ -288,7 +397,9 @@ export function PrintersPage() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
-            <DialogTitle>Новый принтер</DialogTitle>
+            <DialogTitle>
+              {editing?.id ? 'Редактировать принтер' : 'Новый принтер'}
+            </DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="grid gap-3 sm:grid-cols-2">
