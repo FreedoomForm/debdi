@@ -27,7 +27,10 @@
     "init-admin": "tsx scripts/reset-admin.ts",
     "tambo:api-catalog": "node scripts/generate-tambo-api-catalog.mjs",
     "tambo:ui-catalog": "node scripts/generate-tambo-ui-catalog.mjs",
-    "db:translate-website-content": "tsx scripts/translate-website-content.ts"
+    "db:translate-website-content": "tsx scripts/translate-website-content.ts",
+    "test:system": "node tests/system/run-all.mjs",
+    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:all": "yarn test:system && yarn test:e2e"
   },
   "dependencies": {
     "@codemirror/language": "^6.11.3",

@@ -8,6 +8,11 @@ import type { ReceiptPayload } from '@/lib/pos'
  *
  * Returns a printable HTML receipt that can be opened in a new window;
  * the page auto-triggers `window.print()` on load.
+ *
+ * @public — receipt number itself is the auth token (cryptographically
+ * random suffix per receipt). Anyone with the URL can re-print, which
+ * matches industry norms (Square / Stripe digital receipts work the
+ * same way). Do not put PII beyond what was on the original paper chit.
  */
 export async function GET(
   _request: NextRequest,

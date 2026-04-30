@@ -693,23 +693,24 @@ enum ReservationStatus {
 
 // Cashier shift / register session.
 model CashierShift {
-  id            String      @id @default(cuid())
-  cashierId     String // Admin (LOW_ADMIN / WORKER) id
-  registerId    String? // Optional: a physical register identifier
-  openedAt      DateTime    @default(now())
-  closedAt      DateTime?
-  openingFloat  Float       @default(0) // Cash in drawer at start
-  closingCash   Float?
-  expectedCash  Float?
-  cashDelta     Float? // Closing - expected
-  totalSales    Float       @default(0)
-  totalTax      Float       @default(0)
-  totalDiscount Float       @default(0)
-  totalTips     Float       @default(0)
-  ordersCount   Int         @default(0)
-  status        ShiftStatus @default(OPEN)
-  notes         String?
-  payments      Payment[]
+  id              String               @id @default(cuid())
+  cashierId       String // Admin (LOW_ADMIN / WORKER) id
+  registerId      String? // Optional: a physical register identifier
+  openedAt        DateTime             @default(now())
+  closedAt        DateTime?
+  openingFloat    Float                @default(0) // Cash in drawer at start
+  closingCash     Float?
+  expectedCash    Float?
+  cashDelta       Float? // Closing - expected
+  totalSales      Float                @default(0)
+  totalTax        Float                @default(0)
+  totalDiscount   Float                @default(0)
+  totalTips       Float                @default(0)
+  ordersCount     Int                  @default(0)
+  status          ShiftStatus          @default(OPEN)
+  notes           String?
+  payments        Payment[]
+  drawerMovements CashDrawerMovement[]
 
   @@index([cashierId, openedAt])
   @@map("cashier_shifts")
@@ -1084,4 +1085,28 @@ model TimeclockEntry {
   @@index([employeeId, clockedInAt])
   @@index([ownerAdminId])
   @@map("timeclock_entries")
+}
+
+// Cash drawer movements — manual cash in/out (paid-in, paid-out, drop, change-fund).
+// Linked to a cashier shift so the closing reconciliation can account for them.
+model CashDrawerMovement {
+  id          String             @id @default(cuid())
+  shiftId     String
+  shift       CashierShift       @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  type        CashDrawerMoveType
+  amount      Float // signed: positive = in, negative = out
+  reason      String?
+  performedBy String? // Admin id
+  createdAt   DateTime           @default(now())
+
+  @@index([shiftId, createdAt])
+  @@map("cash_drawer_movements")
+}
+
+enum CashDrawerMoveType {
+  PAID_IN // cash added (e.g. tips, manual top-up)
+  PAID_OUT // cash removed (e.g. petty expense, supplier paid in cash)
+  DROP // cash sent to safe / deposit
+  CHANGE_FUND // change brought in
+  ADJUSTMENT // manual reconciliation
 }

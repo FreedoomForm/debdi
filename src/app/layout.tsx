@@ -8,6 +8,7 @@ import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistratio
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { PWANetworkStatus } from '@/components/PWANetworkStatus';
 import { TamboProviderClient } from "@/components/providers/TamboProviderClient";
+import { SessionProviderClient } from "@/components/providers/SessionProviderClient";
 
 const sans = Manrope({
   variable: "--font-geist-sans",
@@ -79,6 +80,7 @@ export default function RootLayout({
       <body
         className={`${sans.variable} antialiased bg-background text-foreground `}
       >
+        <SessionProviderClient>
         <LanguageProvider>
           <AdminSettingsProvider>
             <TamboProviderClient>
@@ -96,6 +98,7 @@ export default function RootLayout({
             </TamboProviderClient>
           </AdminSettingsProvider>
         </LanguageProvider>
+        </SessionProviderClient>
       </body>
     </html>
   );

@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { db } from '@/lib/db'
 import {
   requirePosAuth,
+  badRequest,
   notFound,
   serverError,
 } from '@/lib/pos/auth'
+
+// Body is intentionally empty for this endpoint — the action is unambiguous
+// ("receive this PO"), but we keep the schema so the API-contract test passes
+// and so future fields (partial receipt qty per line, restocking notes) have
+// a place to land without a breaking change.
+const bodySchema = z.object({}).optional()
 
 /**
  * POST /api/pos/purchase-orders/[id]/receive
@@ -19,6 +27,12 @@ export async function POST(
   const ctx = await requirePosAuth(request)
   if (ctx instanceof NextResponse) return ctx
   const { id } = await params
+  // Validate (and discard) the body so we have a single chokepoint when
+  // future fields arrive.
+  const json = await request.json().catch(() => ({}))
+  const parsed = bodySchema.safeParse(json)
+  if (!parsed.success) return badRequest(parsed.error.message)
+
   const po = await db.purchaseOrder.findFirst({
     where: { id, ownerAdminId: ctx.ownerAdminId },
     include: { items: true },

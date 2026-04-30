@@ -1,0 +1,29 @@
+{
+  "name": "debdi-pos-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Debdi POS — Android native wrapper (Capacitor)",
+  "scripts": {
+    "init": "npx cap init 'Debdi POS' uz.debdi.pos --web-dir=out",
+    "add-android": "npx cap add android",
+    "sync": "npx cap sync android",
+    "open-android": "npx cap open android",
+    "build:web": "cd ../.. && yarn build && cd native/android && cp -R ../../out ./out 2>/dev/null || echo 'no-static-out'",
+    "build:apk": "cd android && ./gradlew assembleRelease",
+    "build:bundle": "cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1",
+    "@capacitor/network": "^6.0.2",
+    "@capacitor/preferences": "^6.0.2",
+    "@capacitor/share": "^6.0.2",
+    "@capacitor/camera": "^6.0.2",
+    "@capacitor/barcode-scanner": "^2.0.1",
+    "@capacitor-community/bluetooth-le": "^6.0.0",
+    "@capacitor-community/sqlite": "^6.0.0"
+  }
+}
