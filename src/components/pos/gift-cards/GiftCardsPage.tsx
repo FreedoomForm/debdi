@@ -37,6 +37,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { formatCurrency, formatDateTime } from '@/lib/pos'
 
 type GiftCard = {
@@ -128,32 +129,24 @@ export function GiftCardsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/terminal" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Gift className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Подарочные карты</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {items.length}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw
-              className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
-            />
-            Обновить
-          </Button>
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Выпустить
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Подарочные карты"
+        icon={<Gift className="h-4 w-4 text-amber-500" />}
+        backHref="/pos/terminal"
+        badge={items.length}
+        actions={
+          <>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Выпустить
+            </Button>
+          </>
+        }
+      />
 
       <main className="mx-auto max-w-6xl px-4 py-6">
         {loading ? (

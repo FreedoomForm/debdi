@@ -46,6 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { formatCurrency } from '@/lib/pos'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 
@@ -285,30 +286,23 @@ export function EmployeesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Users className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Сотрудники</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {visible.length}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="mr-1 h-4 w-4" />
-            Добавить
-          </Button>
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
-            Обновить
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Сотрудники"
+        icon={<Users className="h-4 w-4 text-amber-500" />}
+        badge={visible.length}
+        actions={
+          <>
+            <Button size="sm" onClick={openCreate}>
+              <Plus className="mr-1 h-4 w-4" />
+              Добавить
+            </Button>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-2 border-b border-border bg-card p-3 sm:grid-cols-4">

@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/card'
 import { formatCurrency, formatDateTime, type PosShift } from '@/lib/pos'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 
 export function ShiftPage() {
   const [open, setOpen] = useState<PosShift | null>(null)
@@ -122,25 +123,19 @@ export function ShiftPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/terminal" aria-label="К терминалу">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <h1 className="text-sm font-semibold">Касса · Смена</h1>
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {open ? (
+      <PosPageHeader
+        title="Касса · Смена"
+        backHref="/pos/terminal"
+        badge={
+          open ? (
             <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
               ● Смена открыта
             </Badge>
           ) : (
             <Badge variant="secondary">Смена закрыта</Badge>
-          )}
-        </div>
-      </header>
+          )
+        }
+      />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
         {loading ? (
