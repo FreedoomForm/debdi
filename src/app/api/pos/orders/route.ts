@@ -251,16 +251,26 @@ export async function POST(request: NextRequest) {
       })
 
       // Decrement stock + log stock movements.
+      // Auto-86: when a tracked product's stockOnHand drops to <= 0 we mark
+      // it isActive=false so the POS grid hides it immediately. The product
+      // is automatically re-enabled once stock comes back via
+      // StockMovement of type 'PURCHASE' / 'ADJUSTMENT' (handled by the
+      // inventory movements API).
       for (const l of data.lines) {
         if (!l.productId) continue
         const product = await tx.product.findUnique({
           where: { id: l.productId },
-          select: { id: true, trackStock: true, stockOnHand: true },
+          select: { id: true, trackStock: true, stockOnHand: true, name: true },
         })
         if (!product || !product.trackStock) continue
+        const newStock = product.stockOnHand - l.quantity
         await tx.product.update({
           where: { id: product.id },
-          data: { stockOnHand: { decrement: l.quantity } },
+          data: {
+            stockOnHand: { decrement: l.quantity },
+            // Auto-86 once we hit zero (or below).
+            ...(newStock <= 0 ? { isActive: false } : {}),
+          },
         })
         await tx.stockMovement.create({
           data: {
@@ -272,6 +282,18 @@ export async function POST(request: NextRequest) {
             performedBy: ctx.user.id,
           },
         })
+        // Notify owner that the item is now 86'd.
+        if (newStock <= 0) {
+          await tx.notification.create({
+            data: {
+              ownerAdminId: ctx.ownerAdminId,
+              type: 'LOW_STOCK',
+              title: `Нет в наличии: ${product.name}`,
+              body: `Товар автоматически скрыт в POS-терминале (Auto-86). Приход вернёт его в продажу.`,
+              link: '/pos/products',
+            },
+          })
+        }
       }
 
       // Insert payments.

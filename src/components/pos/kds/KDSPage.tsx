@@ -54,6 +54,18 @@ const REFRESH_MS = 5000
 const WARN_MIN = 8
 const DANGER_MIN = 15
 
+type StationKey = 'ALL' | 'HOT' | 'COLD' | 'BAR' | 'GRILL' | 'BAKERY' | 'UNROUTED'
+
+const STATION_LABEL: Record<StationKey, string> = {
+  ALL: 'Все станции',
+  HOT: 'Горячий цех',
+  COLD: 'Холодный цех',
+  BAR: 'Бар',
+  GRILL: 'Гриль',
+  BAKERY: 'Пекарня',
+  UNROUTED: 'Без станции',
+}
+
 export function KDSPage() {
   const [orders, setOrders] = useState<KdsOrder[]>([])
   const [loading, setLoading] = useState(true)
@@ -61,13 +73,20 @@ export function KDSPage() {
   const [now, setNow] = useState(Date.now())
   const [soundOn, setSoundOn] = useState(false)
   const [knownIds, setKnownIds] = useState<Set<string>>(new Set())
+  const [station, setStation] = useState<StationKey>('ALL')
+  const [stationCounts, setStationCounts] = useState<Record<string, number>>({})
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/pos/kds', { credentials: 'include' })
+      const url = station === 'ALL' ? '/api/pos/kds' : `/api/pos/kds?station=${station}`
+      const res = await fetch(url, { credentials: 'include' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = (await res.json()) as { items?: KdsOrder[] }
+      const data = (await res.json()) as {
+        items?: KdsOrder[]
+        stationCounts?: Record<string, number>
+      }
       const items = data.items ?? []
+      setStationCounts(data.stationCounts ?? {})
       // Detect new tickets and chime.
       setKnownIds((prev) => {
         const newIds = new Set(prev)
@@ -94,13 +113,13 @@ export function KDSPage() {
     } finally {
       setLoading(false)
     }
-  }, [loading, soundOn])
+  }, [loading, soundOn, station])
 
   useEffect(() => {
     load()
     const t = setInterval(load, REFRESH_MS)
     return () => clearInterval(t)
-  }, [load])
+  }, [load, station])
 
   // Tick every second for ageing colors.
   useEffect(() => {
@@ -187,6 +206,43 @@ export function KDSPage() {
           </Button>
         </div>
       </header>
+
+      {/* Station filter chips (Hot/Cold/Bar/Grill/Bakery/Unrouted) */}
+      <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-800 bg-slate-900/60 px-4 py-2">
+        {(['ALL', 'HOT', 'COLD', 'BAR', 'GRILL', 'BAKERY', 'UNROUTED'] as StationKey[]).map((key) => {
+          const active = station === key
+          const count =
+            key === 'ALL'
+              ? Object.values(stationCounts).reduce((s, n) => s + n, 0)
+              : stationCounts[key] ?? 0
+          if (key !== 'ALL' && count === 0 && !active) return null
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setStation(key)}
+              className={cn(
+                'flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition',
+                active
+                  ? 'border-amber-400 bg-amber-400 text-slate-950'
+                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+              )}
+            >
+              <span>{STATION_LABEL[key]}</span>
+              {count > 0 && (
+                <span
+                  className={cn(
+                    'rounded-full px-1.5 text-[10px] tabular-nums',
+                    active ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-700 text-slate-200'
+                  )}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </div>
 
       {/* Body — two columns: NEW / IN_PROCESS */}
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2">
