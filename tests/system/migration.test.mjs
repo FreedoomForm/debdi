@@ -132,19 +132,24 @@ test('nav structure references each new POS page', () => {
   }
 })
 
-test('nav still surfaces legacy entries (no silent removal)', () => {
+test('nav contains zero legacy /middle-admin links', () => {
+  // User requirement: the new left-rail must never expose legacy admin
+  // pages. Legacy pages still exist in /middle-admin (no redirects, no
+  // deletions per the migration test above) but they are accessed only
+  // by direct URL — NOT through the unified nav.
   const nav = readFileSync('src/lib/nav/structure.ts', 'utf8')
-  const expectedLegacy = [
-    '/middle-admin?tab=finance',
-    '/middle-admin?tab=warehouse',
-    '/middle-admin?tab=interface',
-    '/middle-admin?tab=bin',
-    '/middle-admin?tab=admins',
-    '/middle-admin?tab=orders',
-  ]
-  for (const href of expectedLegacy) {
-    assert.ok(nav.includes(href), `legacy entry removed from nav: ${href}`)
-  }
+  // Strip JS comments before scanning so doc-block references don't trip
+  // the assertion.
+  const code = nav
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '')
+  const legacyMatches = code.match(/\/middle-admin/g) ?? []
+  assert.strictEqual(
+    legacyMatches.length,
+    0,
+    `nav still has ${legacyMatches.length} legacy /middle-admin link(s) ` +
+      `in code (comments are ignored); they must be removed from the unified left-rail.`
+  )
 })
 
 test('UnifiedShell wraps useSearchParams consumers in <Suspense>', () => {

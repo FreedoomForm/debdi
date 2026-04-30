@@ -95,11 +95,17 @@ export function UnifiedSidebar({
     [pathname, searchStr]
   )
 
-  // Reset pinned override whenever the user actually navigates somewhere new
-  // — so pin doesn't outlive the route change.
+  // Sync pinned section with the active route only when the user navigates
+  // OUTSIDE of the currently pinned section. Inside a pinned section the
+  // pin must stay so all sub-children remain visible in the level-2 rail
+  // — fixes UX where clicking 'Kitchen' / 'Sales' / 'Floor' previously
+  // either redirected away or collapsed the children rail mid-flight.
   useEffect(() => {
-    setPinnedSectionId(null)
-  }, [pathname, searchStr])
+    if (!pinnedSectionId) return
+    if (activeSection && activeSection.id !== pinnedSectionId) {
+      setPinnedSectionId(activeSection.id)
+    }
+  }, [pathname, searchStr, activeSection, pinnedSectionId])
 
   // Priority: pinned > hovered > active route > first section.
   const expandedId =

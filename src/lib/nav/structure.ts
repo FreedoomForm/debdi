@@ -1,18 +1,17 @@
 /**
  * Unified hierarchical navigation tree for the entire system.
  *
- * 10 top-level tabs × up to 10 sub-items each = consistent two-level menu
- * across admin, POS, and operations. Used by:
+ * 10 top-level tabs × up to 10 sub-items each = consistent two-level menu.
+ * Used by:
  *   • src/components/layout/UnifiedSidebar.tsx
- *   • src/app/(unified)/layout.tsx
  *   • mobile bottom-bar
  *   • command palette (Cmd+K) search
  *
- * Each top-level tab has:
- *   - id: stable identifier
- *   - label, icon, description
- *   - color: Tailwind accent for the tab pill
- *   - children: sub-buttons that show in the second-level rail
+ * Design rules (enforced by tests/system/nav-structure.test.mjs):
+ *   • Every href must point to /pos/* (no /middle-admin/* legacy links).
+ *   • No two children in the same section may share base path or label.
+ *   • Each top-level click only PINS the section; navigation happens
+ *     exclusively through level-2 children.
  */
 import type { LucideIcon } from 'lucide-react'
 import {
@@ -34,7 +33,6 @@ import {
   Percent,
   Gift,
   Boxes,
-  Tag,
   FolderTree,
   CalendarDays,
   Monitor,
@@ -47,7 +45,6 @@ import {
   Cog,
   History,
   MapPin,
-  Database,
   MessageSquare,
   Globe,
   CreditCard,
@@ -85,12 +82,10 @@ export const NAV: NavSection[] = [
     color: 'amber',
     children: [
       { id: 'overview', href: '/pos/dashboard', label: 'Дашборд', icon: LayoutDashboard, desc: 'Общая сводка дня' },
-      { id: 'reports-sales', href: '/pos/reports', label: 'Отчёты продаж', icon: BarChart3, desc: 'Выручка, чеки, тренды' },
-      { id: 'statistics-new', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории', badge: 'new' },
-      { id: 'statistics-legacy', href: '/middle-admin?tab=statistics', label: 'Статистика (старая)', icon: BarChart3, desc: 'Легаси-вид' },
       { id: 'live-status', href: '/pos/dashboard?focus=live', label: 'Лайв-статус', icon: TrendingUp, desc: 'Что происходит сейчас', badge: 'live' },
-      { id: 'history', href: '/pos/history', label: 'Журнал действий', icon: History, desc: 'KPI, фильтры по админу/дате, пагинация', badge: 'new' },
-      { id: 'history-legacy', href: '/middle-admin?tab=history', label: 'Журнал (старый)', icon: History, desc: 'Легаси-вид' },
+      { id: 'statistics', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории' },
+      { id: 'reports', href: '/pos/reports', label: 'Отчёты продаж', icon: BarChart3, desc: 'Выручка, чеки, тренды' },
+      { id: 'history', href: '/pos/history', label: 'Журнал действий', icon: History, desc: 'Аудит-лог, фильтры' },
     ],
   },
   // ─── 2. Sales / POS Terminal ────────────────────────────────────────────
@@ -108,7 +103,6 @@ export const NAV: NavSection[] = [
       { id: 'customer-display', href: '/pos/customer-display', label: 'Экран клиента', icon: Monitor, desc: 'Второй экран' },
       { id: 'discounts', href: '/pos/discounts', label: 'Скидки и промо', icon: Percent, desc: 'Купоны, акции' },
       { id: 'gift-cards', href: '/pos/gift-cards', label: 'Подарочные карты', icon: Gift, desc: 'Выпуск и баланс' },
-      { id: 'payments-mix', href: '/pos/reports?focus=payments', label: 'Способы оплаты', icon: CreditCard, desc: 'Касса/карта/перевод' },
     ],
   },
   // ─── 3. Kitchen / KDS ───────────────────────────────────────────────────
@@ -121,10 +115,9 @@ export const NAV: NavSection[] = [
     color: 'rose',
     children: [
       { id: 'kds', href: '/pos/kds', label: 'KDS · Дисплей', icon: ChefHat, desc: 'Активные тикеты' },
-      { id: 'cooking', href: '/pos/warehouse?tab=cooking', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд' },
+      { id: 'cooking-plan', href: '/pos/warehouse?tab=cooking', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд' },
       { id: 'menu-sets', href: '/pos/warehouse?tab=sets', label: 'Меню-сеты', icon: Layers, desc: 'Калорийные группы' },
       { id: 'dishes', href: '/pos/warehouse?tab=dishes', label: 'Блюда', icon: Utensils, desc: 'Рецепты, ингредиенты' },
-      { id: 'cooking-legacy', href: '/middle-admin?tab=warehouse&sub=cooking', label: 'План (старая)', icon: ChefHat, desc: 'Легаси-вид' },
     ],
   },
   // ─── 4. Tables / Reservations / Floor ───────────────────────────────────
@@ -152,10 +145,8 @@ export const NAV: NavSection[] = [
       { id: 'products', href: '/pos/products', label: 'Товары', icon: Package, desc: 'SKU, цены, остатки' },
       { id: 'categories', href: '/pos/categories', label: 'Категории', icon: FolderTree, desc: 'Группы товаров' },
       { id: 'inventory', href: '/pos/inventory', label: 'Движения склада', icon: Boxes, desc: 'Аудит остатков' },
-      { id: 'warehouse', href: '/pos/warehouse', label: 'Склад продуктов', icon: Boxes, desc: 'Сырьё для блюд', badge: 'new' },
-      { id: 'warehouse-legacy', href: '/middle-admin?tab=warehouse', label: 'Склад (старая)', icon: Boxes, desc: 'Легаси-вид' },
-      { id: 'suppliers', href: '/pos/suppliers', label: 'Поставщики', icon: Truck, desc: 'Контакты' },
-      { id: 'purchase-orders', href: '/pos/suppliers?tab=po', label: 'Закупки', icon: Tag, desc: 'Заказы поставщикам' },
+      { id: 'warehouse', href: '/pos/warehouse', label: 'Склад продуктов', icon: Boxes, desc: 'Сырьё для блюд' },
+      { id: 'suppliers', href: '/pos/suppliers', label: 'Поставщики и закупки', icon: Truck, desc: 'Контакты, PO' },
     ],
   },
   // ─── 6. CRM / Customers / Loyalty ───────────────────────────────────────
@@ -167,31 +158,24 @@ export const NAV: NavSection[] = [
     desc: 'CRM, лояльность, чат',
     color: 'cyan',
     children: [
-      { id: 'clients', href: '/pos/clients', label: 'База клиентов', icon: Users, desc: 'CRM, KPI, фильтры', badge: 'new' },
-      { id: 'clients-legacy', href: '/middle-admin?tab=clients', label: 'Клиенты (старая)', icon: Users, desc: 'Легаси-вид' },
+      { id: 'clients', href: '/pos/clients', label: 'База клиентов', icon: Users, desc: 'CRM, KPI, фильтры' },
       { id: 'loyalty', href: '/pos/loyalty', label: 'Лояльность', icon: Award, desc: 'Баллы и уровни' },
-      { id: 'chat', href: '/pos/chat', label: 'Чат', icon: MessageSquare, desc: 'Двухпанельный мессенджер', badge: 'new' },
-      { id: 'chat-legacy', href: '/middle-admin?tab=chat', label: 'Чат (старый)', icon: MessageSquare, desc: 'Легаси-вид' },
-      { id: 'sites', href: '/pos/sites', label: 'Сайты-витрины', icon: Globe, desc: 'Поддомен, тема, контент (ru/uz/en)', badge: 'new' },
-      { id: 'website-legacy', href: '/middle-admin?tab=interface&sub=site', label: 'Сайт-витрина (старая)', icon: Globe, desc: 'Легаси-вид' },
+      { id: 'chat', href: '/pos/chat', label: 'Чат', icon: MessageSquare, desc: 'Двухпанельный мессенджер' },
+      { id: 'sites', href: '/pos/sites', label: 'Сайт-витрина', icon: Globe, desc: 'Поддомен, тема, контент' },
     ],
   },
   // ─── 7. Delivery / Couriers / Routes ────────────────────────────────────
   {
     id: 'delivery',
-    href: '/middle-admin?tab=orders',
+    href: '/pos/delivery',
     label: 'Доставка',
     icon: Truck,
     desc: 'Курьеры, маршруты, карта',
     color: 'indigo',
     children: [
-      { id: 'orders-delivery', href: '/pos/delivery', label: 'Заказы доставки', icon: Receipt, desc: 'KPI, статус-пиплайн, лайв-обновление', badge: 'new' },
-      { id: 'orders-delivery-legacy', href: '/middle-admin?tab=orders', label: 'Заказы (старая)', icon: Receipt, desc: 'Легаси-вид' },
-      { id: 'couriers', href: '/pos/couriers', label: 'Курьеры', icon: Truck, desc: 'KPI, лайв-позиции, зарплата', badge: 'new' },
-      { id: 'couriers-legacy', href: '/middle-admin?tab=admins&role=COURIER', label: 'Курьеры (старая)', icon: Truck, desc: 'Легаси-вид' },
-      { id: 'live-map', href: '/pos/delivery/map', label: 'Live-карта', icon: MapPin, desc: 'Курьеры в реальном времени (Leaflet)', badge: 'live' },
-      { id: 'live-map-legacy', href: '/middle-admin?tab=orders&sub=map', label: 'Live-карта (старая)', icon: MapPin, desc: 'Легаси-вид' },
-      { id: 'route-optimize', href: '/middle-admin?tab=orders&sub=optimize', label: 'Оптимизация маршрутов', icon: TrendingUp, desc: 'ORS-планирование' },
+      { id: 'orders-delivery', href: '/pos/delivery', label: 'Заказы доставки', icon: Receipt, desc: 'KPI, статус-пиплайн' },
+      { id: 'couriers', href: '/pos/couriers', label: 'Курьеры', icon: Truck, desc: 'KPI, лайв-позиции, зарплата' },
+      { id: 'live-map', href: '/pos/delivery/map', label: 'Live-карта', icon: MapPin, desc: 'Курьеры в реальном времени', badge: 'live' },
     ],
   },
   // ─── 8. Finance / Cash / Salary ─────────────────────────────────────────
@@ -203,10 +187,8 @@ export const NAV: NavSection[] = [
     desc: 'Касса, налоги, зарплата',
     color: 'lime',
     children: [
-      { id: 'finance-new', href: '/pos/finance', label: 'Финансы (новая)', icon: Wallet, desc: 'KPI, фильтры, экспорт', badge: 'new' },
-      { id: 'finance-overview', href: '/middle-admin?tab=finance', label: 'Сводка (старая)', icon: Wallet, desc: 'Доходы и расходы' },
+      { id: 'finance', href: '/pos/finance', label: 'Финансы', icon: Wallet, desc: 'KPI, фильтры, экспорт' },
       { id: 'cash-drawer', href: '/pos/shift', label: 'Кассовый ящик', icon: CreditCard, desc: 'Внесения и изъятия' },
-      { id: 'salary', href: '/middle-admin?tab=finance&sub=salary', label: 'Зарплата', icon: Wallet, desc: 'Выплаты сотрудникам' },
       { id: 'tax-rates', href: '/pos/settings?focus=tax', label: 'Ставки налогов', icon: Percent, desc: 'НДС и сервисный сбор' },
       { id: 'reports-fin', href: '/pos/reports', label: 'Финансовые отчёты', icon: BarChart3, desc: 'Прибыль/убыток' },
     ],
@@ -221,10 +203,8 @@ export const NAV: NavSection[] = [
     color: 'violet',
     children: [
       { id: 'employees', href: '/pos/employees', label: 'Сотрудники', icon: UserCog, desc: 'Роль, зарплата' },
-      { id: 'admins', href: '/pos/admins', label: 'Персонал', icon: ShieldCheck, desc: 'KPI, фильтры, создание', badge: 'new' },
-      { id: 'admins-legacy', href: '/middle-admin?tab=admins', label: 'Управление (старая)', icon: ShieldCheck, desc: 'Легаси-вид' },
+      { id: 'admins', href: '/pos/admins', label: 'Персонал и доступы', icon: ShieldCheck, desc: 'Создание, права, KPI' },
       { id: 'timeclock', href: '/pos/timeclock', label: 'Тайм-трекер', icon: Timer, desc: 'Учёт смен' },
-      { id: 'roles', href: '/pos/employees?focus=roles', label: 'Роли и доступ', icon: ShieldCheck, desc: 'Допуски к вкладкам' },
     ],
   },
   // ─── 10. Settings ───────────────────────────────────────────────────────
@@ -239,10 +219,7 @@ export const NAV: NavSection[] = [
       { id: 'pos-settings', href: '/pos/settings', label: 'Параметры POS', icon: Cog, desc: 'Валюта, налоги, чек' },
       { id: 'printers', href: '/pos/printers', label: 'Принтеры', icon: Printer, desc: 'Касса, кухня, бар' },
       { id: 'branches', href: '/pos/branches', label: 'Филиалы', icon: Store, desc: 'Мульти-локация' },
-      { id: 'trash', href: '/pos/trash', label: 'Корзина', icon: Trash2, desc: 'Удалённые клиенты и заказы', badge: 'new' },
-      { id: 'trash-legacy', href: '/middle-admin?tab=bin', label: 'Корзина (старая)', icon: Trash2, desc: 'Легаси-вид' },
-      { id: 'database', href: '/middle-admin/database', label: 'База данных', icon: Database, desc: 'Импорт / экспорт', rolesAllowed: ['SUPER_ADMIN', 'MIDDLE_ADMIN'] },
-      { id: 'interface', href: '/middle-admin?tab=interface', label: 'Интерфейс', icon: Settings, desc: 'Темы, языки, доступы' },
+      { id: 'trash', href: '/pos/trash', label: 'Корзина', icon: Trash2, desc: 'Удалённые клиенты и заказы' },
     ],
   },
 ]
@@ -253,18 +230,18 @@ export function findActiveNav(pathname: string, search: string = ''): {
   child?: NavItem
 } {
   const fullPath = `${pathname}${search}`
-  // Sort by href length so we match the most specific item first.
+  // Build a flat list once per call.
   const all: Array<{ section: NavSection; item: NavItem }> = []
   for (const s of NAV) {
     for (const c of s.children) all.push({ section: s, item: c })
   }
-  // Try exact match including search params
+  // Try exact match including search params first.
   const exact = all.find((x) => x.item.href === fullPath)
   if (exact) return { section: exact.section, child: exact.item }
-  // Try pathname-only match
+  // Then pathname-only match (ignoring query string).
   const pathOnly = all.find((x) => x.item.href.split('?')[0] === pathname)
   if (pathOnly) return { section: pathOnly.section, child: pathOnly.item }
-  // Try section root
+  // Finally section root.
   const section = NAV.find((s) => pathname.startsWith(s.href.split('?')[0]))
   if (section) return { section }
   return {}
