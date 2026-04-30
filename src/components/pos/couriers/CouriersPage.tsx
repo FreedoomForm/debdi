@@ -54,6 +54,7 @@ import {
 import { formatCurrency } from '@/lib/pos'
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Courier = {
   id: string
@@ -262,28 +263,28 @@ export default function CouriersPage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI
+        <KpiTile
           label="Всего"
-          value={String(stats.total)}
+          value={stats.total}
           icon={<Truck className="h-4 w-4" />}
           tone="neutral"
           hint={`${stats.active} активных`}
         />
-        <KPI
+        <KpiTile
           label="Онлайн сейчас"
-          value={String(stats.online)}
+          value={stats.online}
           icon={<CircleDot className="h-4 w-4" />}
           tone={stats.online > 0 ? 'emerald' : 'neutral'}
           hint={`${stats.offline} оффлайн`}
         />
-        <KPI
+        <KpiTile
           label="Сегодня заказов"
-          value={String(stats.ordersToday)}
+          value={stats.ordersToday}
           icon={<Truck className="h-4 w-4" />}
           tone="emerald"
           hint="по всем курьерам"
         />
-        <KPI
+        <KpiTile
           label="Фонд зарплаты"
           value={formatCurrency(stats.totalSalary, 'UZS')}
           icon={<Wallet className="h-4 w-4" />}
@@ -474,39 +475,4 @@ export default function CouriersPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  icon,
-  hint,
-  tone,
-}: {
-  label: string
-  value: string
-  icon: React.ReactNode
-  hint: string
-  tone: 'emerald' | 'rose' | 'amber' | 'neutral'
-}) {
-  const toneClass = {
-    emerald: 'border-emerald-200 bg-emerald-50/60',
-    rose: 'border-rose-200 bg-rose-50/60',
-    amber: 'border-amber-200 bg-amber-50/60',
-    neutral: 'border-border bg-card',
-  }[tone]
-  const valueClass = {
-    emerald: 'text-emerald-900',
-    rose: 'text-rose-900',
-    amber: 'text-amber-900',
-    neutral: 'text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-xl border p-3 shadow-sm', toneClass)}>
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className={cn('mt-1 text-lg font-bold tabular-nums', valueClass)}>{value}</div>
-      <div className="text-[10px] text-muted-foreground">{hint}</div>
-    </div>
-  )
-}
+// KPI tile is now provided by @/components/pos/shared/KpiTile
