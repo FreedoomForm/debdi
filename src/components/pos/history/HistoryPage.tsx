@@ -40,6 +40,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type ActionLog = {
   id: string
@@ -185,18 +186,18 @@ export default function HistoryPage() {
 
       <main className="mx-auto max-w-[1400px] space-y-3 p-3 lg:p-4">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <KPI label="Всего записей" value={String(total)} tone="neutral" />
-          <KPI
+          <KpiTile label="Всего записей" value={total} tone="neutral" />
+          <KpiTile
             label="Сегодня"
-            value={String(stats.todayCount)}
+            value={stats.todayCount}
             tone={stats.todayCount > 0 ? 'emerald' : 'neutral'}
           />
-          <KPI
+          <KpiTile
             label="Админов активно"
-            value={String(stats.uniqueAdmins)}
+            value={stats.uniqueAdmins}
             tone={stats.uniqueAdmins > 0 ? 'amber' : 'neutral'}
           />
-          <KPI label="Типов действий" value={String(stats.actionTypes)} tone="neutral" />
+          <KpiTile label="Типов действий" value={stats.actionTypes} tone="neutral" />
         </div>
 
         <Card>
@@ -370,24 +371,4 @@ export default function HistoryPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: string
-  tone: 'emerald' | 'amber' | 'neutral'
-}) {
-  const cls = {
-    emerald: 'border-emerald-200 bg-emerald-50/60 text-emerald-900',
-    amber: 'border-amber-200 bg-amber-50/60 text-amber-900',
-    neutral: 'border-border bg-card text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-lg border p-2 shadow-sm', cls)}>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="mt-0.5 text-base font-bold tabular-nums">{value}</div>
-    </div>
-  )
-}
+

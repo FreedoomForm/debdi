@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type BinClient = {
   id: string
@@ -260,10 +261,10 @@ export default function TrashPage() {
 
       <main className="mx-auto max-w-[1400px] space-y-3 p-3 lg:p-4">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <KPI label="Клиентов в корзине" value={String(clients.length)} tone="rose" icon={<Users className="h-3 w-3" />} />
-          <KPI label="Заказов в корзине" value={String(orders.length)} tone="rose" icon={<Receipt className="h-3 w-3" />} />
-          <KPI label="Выбрано клиентов" value={String(selectedClients.size)} tone={selectedClients.size > 0 ? 'amber' : 'neutral'} icon={<Users className="h-3 w-3" />} />
-          <KPI label="Выбрано заказов" value={String(selectedOrders.size)} tone={selectedOrders.size > 0 ? 'amber' : 'neutral'} icon={<Receipt className="h-3 w-3" />} />
+          <KpiTile label="Клиентов в корзине" value={clients.length} tone="rose" icon={<Users className="h-3 w-3" />} />
+          <KpiTile label="Заказов в корзине" value={orders.length} tone="rose" icon={<Receipt className="h-3 w-3" />} />
+          <KpiTile label="Выбрано клиентов" value={selectedClients.size} tone={selectedClients.size > 0 ? 'amber' : 'neutral'} icon={<Users className="h-3 w-3" />} />
+          <KpiTile label="Выбрано заказов" value={selectedOrders.size} tone={selectedOrders.size > 0 ? 'amber' : 'neutral'} icon={<Receipt className="h-3 w-3" />} />
         </div>
 
         <Tabs value={active} onValueChange={(v) => setActive(v as typeof active)}>
@@ -460,33 +461,6 @@ export default function TrashPage() {
           </CardContent>
         </Card>
       </main>
-    </div>
-  )
-}
-
-function KPI({
-  label,
-  value,
-  tone,
-  icon,
-}: {
-  label: string
-  value: string
-  tone: 'rose' | 'amber' | 'neutral'
-  icon: React.ReactNode
-}) {
-  const cls = {
-    rose: 'border-rose-200 bg-rose-50/60 text-rose-900',
-    amber: 'border-amber-200 bg-amber-50/60 text-amber-900',
-    neutral: 'border-border bg-card text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-lg border p-2 shadow-sm', cls)}>
-      <div className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className="mt-0.5 text-base font-bold tabular-nums">{value}</div>
     </div>
   )
 }

@@ -49,6 +49,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Role = 'SUPER_ADMIN' | 'MIDDLE_ADMIN' | 'LOW_ADMIN' | 'COURIER' | 'WORKER'
 
@@ -248,37 +249,37 @@ export default function AdminsPage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <KPI
+        <KpiTile
           label="Всего"
-          value={String(stats.total)}
+          value={stats.total}
           icon={<Users className="h-4 w-4" />}
           tone="neutral"
           hint={`${stats.active} активных`}
         />
-        <KPI
+        <KpiTile
           label="Middle"
-          value={String(stats.byRole.MIDDLE_ADMIN ?? 0)}
+          value={stats.byRole.MIDDLE_ADMIN ?? 0}
           icon={<ShieldCheck className="h-4 w-4" />}
           tone="indigo"
           hint="Главные админы"
         />
-        <KPI
+        <KpiTile
           label="Low"
-          value={String(stats.byRole.LOW_ADMIN ?? 0)}
+          value={stats.byRole.LOW_ADMIN ?? 0}
           icon={<ShieldCheck className="h-4 w-4" />}
           tone="emerald"
           hint="Линейные админы"
         />
-        <KPI
+        <KpiTile
           label="Курьеры"
-          value={String(stats.byRole.COURIER ?? 0)}
+          value={stats.byRole.COURIER ?? 0}
           icon={<Users className="h-4 w-4" />}
           tone="amber"
           hint="Доставка"
         />
-        <KPI
+        <KpiTile
           label="Сотрудники"
-          value={String(stats.byRole.WORKER ?? 0)}
+          value={stats.byRole.WORKER ?? 0}
           icon={<Users className="h-4 w-4" />}
           tone="neutral"
           hint="Кухня, склад"
@@ -456,34 +457,4 @@ export default function AdminsPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  icon,
-  hint,
-  tone,
-}: {
-  label: string
-  value: string
-  icon: React.ReactNode
-  hint: string
-  tone: 'emerald' | 'rose' | 'amber' | 'neutral' | 'indigo'
-}) {
-  const toneClass = {
-    emerald: 'border-emerald-200 bg-emerald-50/60 text-emerald-900',
-    rose: 'border-rose-200 bg-rose-50/60 text-rose-900',
-    amber: 'border-amber-200 bg-amber-50/60 text-amber-900',
-    indigo: 'border-indigo-200 bg-indigo-50/60 text-indigo-900',
-    neutral: 'border-border bg-card text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-xl border p-3 shadow-sm', toneClass)}>
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider opacity-70">
-        {icon}
-        {label}
-      </div>
-      <div className="mt-1 text-lg font-bold tabular-nums">{value}</div>
-      <div className="text-[10px] opacity-70">{hint}</div>
-    </div>
-  )
-}
+// KPI tile is now provided by @/components/pos/shared/KpiTile

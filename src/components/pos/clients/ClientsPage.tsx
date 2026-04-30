@@ -425,39 +425,4 @@ export default function ClientsPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  icon,
-  hint,
-  tone,
-}: {
-  label: string
-  value: string
-  icon: React.ReactNode
-  hint: string
-  tone: 'emerald' | 'rose' | 'amber' | 'neutral'
-}) {
-  const toneClass = {
-    emerald: 'border-emerald-200 bg-emerald-50/60',
-    rose: 'border-rose-200 bg-rose-50/60',
-    amber: 'border-amber-200 bg-amber-50/60',
-    neutral: 'border-border bg-card',
-  }[tone]
-  const valueClass = {
-    emerald: 'text-emerald-900',
-    rose: 'text-rose-900',
-    amber: 'text-amber-900',
-    neutral: 'text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-xl border p-3 shadow-sm', toneClass)}>
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className={cn('mt-1 text-lg font-bold tabular-nums', valueClass)}>{value}</div>
-      <div className="text-[10px] text-muted-foreground">{hint}</div>
-    </div>
-  )
-}
+// KPI tile is now provided by @/components/pos/shared/KpiTile
