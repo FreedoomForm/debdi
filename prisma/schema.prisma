@@ -499,6 +499,7 @@ model Product {
   isActive     Boolean           @default(true)
   isFavorite   Boolean           @default(false) // Pin to POS quick grid
   color        String? // Tile color in POS grid
+  kitchenStation String? // KDS routing: 'HOT', 'COLD', 'BAR', 'GRILL', 'BAKERY' or custom
   variants     ProductVariant[]
   modifiers    ProductModifier[] @relation("ProductModifiersList")
   orderItems   OrderItem[]
@@ -525,6 +526,7 @@ model ProductCategory {
   products     Product[]
   sortOrder    Int               @default(0)
   isActive     Boolean           @default(true)
+  kitchenStation String? // Default station for products in this category (HOT/COLD/BAR/GRILL/BAKERY)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
