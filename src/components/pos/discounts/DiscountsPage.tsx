@@ -17,6 +17,9 @@ import {
   Plus,
   Tag,
   X,
+  Pencil,
+  Power,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -68,6 +71,7 @@ export function DiscountsPage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Partial<PosDiscount> | null>(null)
   const [busy, setBusy] = useState(false)
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -88,27 +92,74 @@ export function DiscountsPage() {
     load()
   }, [load])
 
+  const toggleActive = async (item: PosDiscount) => {
+    setRowBusyId(item.id)
+    try {
+      const res = await fetch(`/api/pos/discounts/${item.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: !item.isActive }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success(item.isActive ? 'Скидка отключена' : 'Скидка активирована')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const deleteItem = async (item: PosDiscount) => {
+    const ok =
+      typeof window === 'undefined' ? true : window.confirm(`Удалить «${item.name}»?`)
+    if (!ok) return
+    setRowBusyId(item.id)
+    try {
+      const res = await fetch(`/api/pos/discounts/${item.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Скидка удалена')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
   const save = async () => {
     if (!editing || !editing.name?.trim()) return
     setBusy(true)
     try {
-      const res = await fetch('/api/pos/discounts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: editing.name,
-          code: editing.code || null,
-          type: editing.type ?? 'PERCENT',
-          value: Number(editing.value) || 0,
-          minSubtotal:
-            editing.minSubtotal != null ? Number(editing.minSubtotal) : null,
-          startsAt: editing.startsAt || null,
-          endsAt: editing.endsAt || null,
-          usageLimit: editing.usageLimit ?? null,
-          isActive: editing.isActive ?? true,
-        }),
-      })
+      const isUpdate = Boolean(editing.id)
+      const res = await fetch(
+        isUpdate ? `/api/pos/discounts/${editing.id}` : '/api/pos/discounts',
+        {
+          method: isUpdate ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: editing.name,
+            code: editing.code || null,
+            type: editing.type ?? 'PERCENT',
+            value: Number(editing.value) || 0,
+            minSubtotal:
+              editing.minSubtotal != null ? Number(editing.minSubtotal) : null,
+            startsAt: editing.startsAt || null,
+            endsAt: editing.endsAt || null,
+            usageLimit: editing.usageLimit ?? null,
+            isActive: editing.isActive ?? true,
+          }),
+        }
+      )
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       toast.success('Сохранено')
       setEditing(null)
@@ -189,17 +240,56 @@ export function DiscountsPage() {
                       </Badge>
                     )}
                   </div>
-                  <Badge
-                    variant={d.isActive ? 'default' : 'secondary'}
-                    className={
-                      d.isActive
-                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100'
-                        : ''
-                    }
-                  >
-                    {d.isActive ? '● Вкл' : 'Выкл'}
-                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Badge
+                      variant={d.isActive ? 'default' : 'secondary'}
+                      className={
+                        d.isActive
+                          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100'
+                          : ''
+                      }
+                    >
+                      {d.isActive ? '● Вкл' : 'Выкл'}
+                    </Badge>
+                  </div>
                 </header>
+
+                <div className="mt-2 flex flex-wrap gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setEditing({ ...d })}
+                    disabled={rowBusyId === d.id}
+                  >
+                    <Pencil className="mr-1 h-3 w-3" />
+                    Изменить
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={d.isActive ? 'secondary' : 'default'}
+                    className="h-7 px-2 text-xs"
+                    onClick={() => toggleActive(d)}
+                    disabled={rowBusyId === d.id}
+                  >
+                    {rowBusyId === d.id ? (
+                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                    ) : (
+                      <Power className="mr-1 h-3 w-3" />
+                    )}
+                    {d.isActive ? 'Откл.' : 'Вкл.'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                    onClick={() => deleteItem(d)}
+                    disabled={rowBusyId === d.id}
+                  >
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    Удалить
+                  </Button>
+                </div>
 
                 <div className="mt-3 text-3xl font-extrabold tracking-tight">
                   {d.type === 'PERCENT'
@@ -251,7 +341,9 @@ export function DiscountsPage() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
-            <DialogTitle>Новая скидка</DialogTitle>
+            <DialogTitle>
+              {editing?.id ? 'Редактировать скидку' : 'Новая скидка'}
+            </DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="grid gap-3 sm:grid-cols-2">
