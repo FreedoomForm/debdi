@@ -9,7 +9,6 @@
  * Designed to live just below the page header so managers can spot anomalies
  * at a glance, without scrolling.
  */
-import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Bell,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatCurrency, formatTime } from '@/lib/pos'
+import { usePolling } from '@/hooks/usePolling'
 
 type LiveSnapshot = {
   openOrders: number
@@ -35,25 +35,7 @@ type LiveSnapshot = {
 }
 
 export function LiveStrip() {
-  const [snap, setSnap] = useState<LiveSnapshot | null>(null)
-
-  const load = useCallback(async () => {
-    try {
-      const res = await fetch('/api/pos/dashboard/live', {
-        credentials: 'include',
-      })
-      if (!res.ok) return
-      setSnap(await res.json())
-    } catch {
-      /* silent — keeps the strip resilient when the network blips */
-    }
-  }, [])
-
-  useEffect(() => {
-    load()
-    const t = setInterval(load, 15000)
-    return () => clearInterval(t)
-  }, [load])
+  const { data: snap } = usePolling<LiveSnapshot>('/api/pos/dashboard/live', 15000)
 
   if (!snap) {
     return (

@@ -5,9 +5,9 @@
  * the current owner.
  *
  * Mounted in the UnifiedShell top-right corner. Polls /api/pos/notifications
- * every 30s and surfaces an unread badge.
+ * every 30s via the shared usePolling hook and surfaces an unread badge.
  */
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Bell, CheckCheck, Loader2 } from 'lucide-react'
 import {
@@ -20,6 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { relativeTime } from '@/lib/pos'
+import { usePolling } from '@/hooks/usePolling'
 
 type Notification = {
   id: string
@@ -29,6 +30,11 @@ type Notification = {
   link?: string | null
   isRead: boolean
   createdAt: string
+}
+
+type NotificationsResponse = {
+  items?: Notification[]
+  unreadCount?: number
 }
 
 const TYPE_TONE: Record<string, string> = {
@@ -44,36 +50,25 @@ const TYPE_TONE: Record<string, string> = {
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false)
-  const [items, setItems] = useState<Notification[]>([])
-  const [unread, setUnread] = useState(0)
-  const [loading, setLoading] = useState(false)
   const [marking, setMarking] = useState(false)
+  const [overlayItems, setOverlayItems] = useState<Notification[] | null>(null)
+  const [overlayUnread, setOverlayUnread] = useState<number | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/pos/notifications', {
-        credentials: 'include',
-      })
-      if (!res.ok) throw new Error()
-      const data = (await res.json()) as {
-        items?: Notification[]
-        unreadCount?: number
-      }
-      setItems(data.items ?? [])
-      setUnread(data.unreadCount ?? 0)
-    } catch {
-      /* silent */
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { data, loading, refresh } = usePolling<NotificationsResponse>(
+    '/api/pos/notifications',
+    30000
+  )
 
+  // Reset local overlay whenever a fresh poll lands.
   useEffect(() => {
-    load()
-    const t = setInterval(load, 30000)
-    return () => clearInterval(t)
-  }, [load])
+    if (data) {
+      setOverlayItems(null)
+      setOverlayUnread(null)
+    }
+  }, [data])
+
+  const items = overlayItems ?? data?.items ?? []
+  const unread = overlayUnread ?? data?.unreadCount ?? 0
 
   const markAllRead = async () => {
     setMarking(true)
@@ -84,8 +79,9 @@ export function NotificationsBell() {
         credentials: 'include',
         body: JSON.stringify({ all: true }),
       })
-      setItems((prev) => prev.map((n) => ({ ...n, isRead: true })))
-      setUnread(0)
+      setOverlayItems(items.map((n) => ({ ...n, isRead: true })))
+      setOverlayUnread(0)
+      refresh()
     } finally {
       setMarking(false)
     }
