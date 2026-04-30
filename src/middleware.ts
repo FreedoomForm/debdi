@@ -16,7 +16,13 @@ function requiredRoleForPath(pathname: string): string | null {
   if (pathname.startsWith('/middle-admin')) return 'MIDDLE_ADMIN'
   if (pathname.startsWith('/low-admin')) return 'LOW_ADMIN'
   if (pathname.startsWith('/courier')) return 'COURIER'
+  // /pos/* is open to any authenticated admin role; per-page checks happen
+  // server-side via requirePosAuth in API handlers.
   return null
+}
+
+function requiresAuthOnly(pathname: string): boolean {
+  return pathname.startsWith('/pos')
 }
 
 function shouldSkipPath(pathname: string) {
@@ -31,7 +37,8 @@ function shouldSkipPath(pathname: string) {
     pathname.startsWith('/middle-admin') ||
     pathname.startsWith('/low-admin') ||
     pathname.startsWith('/super-admin') ||
-    pathname.startsWith('/courier')
+    pathname.startsWith('/courier') ||
+    pathname.startsWith('/pos')
   )
 }
 
@@ -60,6 +67,10 @@ export default auth((request: NextRequest) => {
     if (authUser.role !== requiredRole) {
       const fallbackPath = ROLE_HOME[authUser.role || ''] || '/login'
       return withSecurityHeaders(NextResponse.redirect(new URL(fallbackPath, request.url)))
+    }
+  } else if (requiresAuthOnly(nextUrl.pathname)) {
+    if (!authUser) {
+      return withSecurityHeaders(NextResponse.redirect(new URL('/login', request.url)))
     }
   }
 

@@ -86,6 +86,7 @@ import {
   Truck,
   Database,
   Utensils,
+  ShoppingBag,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -2448,6 +2449,18 @@ export function AdminDashboardPage({ mode }: { mode: AdminDashboardMode }) {
                   </Link>
                 </Button>
               )}
+              <Button
+                asChild
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9"
+                aria-label="POS"
+                title="POS-терминал"
+              >
+                <Link href="/pos/dashboard">
+                  <ShoppingBag className="w-4 h-4" />
+                </Link>
+              </Button>
               {isMiddleAdminView && (
                 <Button
                   asChild
