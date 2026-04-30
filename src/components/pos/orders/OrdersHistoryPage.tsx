@@ -103,6 +103,8 @@ const PAY_TONE: Record<string, string> = {
   UNPAID: 'bg-slate-100 text-slate-700',
 }
 
+type SourceMode = 'pos' | 'delivery' | 'all'
+
 export function OrdersHistoryPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -110,17 +112,79 @@ export function OrdersHistoryPage() {
   const [filter, setFilter] = useState<'all' | 'paid' | 'unpaid' | 'today'>(
     'all'
   )
+  const [source, setSource] = useState<SourceMode>('pos')
   const [selected, setSelected] = useState<Order | null>(null)
   const [refunding, setRefunding] = useState(false)
 
+  // Normalize a legacy delivery /api/orders row into the unified Order shape
+  // so the new UI can render both feeds side by side without redirects to the
+  // old /middle-admin?tab=orders page.
+  const adaptDeliveryOrder = (raw: Record<string, unknown>): Order => {
+    const items = Array.isArray(raw.items)
+      ? (raw.items as Array<Record<string, unknown>>).map((it, i) => ({
+          id: String(it.id ?? `${raw.id}-it-${i}`),
+          name: String(it.name ?? it.title ?? 'Позиция'),
+          quantity: Number(it.quantity ?? it.qty ?? 1),
+          unitPrice: Number(it.unitPrice ?? it.price ?? 0),
+          total: Number(it.total ?? it.lineTotal ?? Number(it.unitPrice ?? 0) * Number(it.quantity ?? 1)),
+          notes: (it.notes as string) ?? null,
+        }))
+      : []
+    const customer = raw.customer as Record<string, unknown> | undefined
+    return {
+      id: String(raw.id),
+      orderNumber: Number(raw.orderNumber ?? raw.number ?? 0),
+      orderStatus: String(raw.status ?? raw.orderStatus ?? 'PENDING'),
+      paymentStatus: String(raw.paymentStatus ?? (raw.isPaid ? 'PAID' : 'UNPAID')),
+      serviceMode: 'DELIVERY',
+      grandTotal: Number(raw.total ?? raw.grandTotal ?? 0),
+      subtotal: Number(raw.subtotal ?? raw.total ?? 0),
+      discountTotal: Number(raw.discount ?? raw.discountTotal ?? 0),
+      taxTotal: Number(raw.tax ?? raw.taxTotal ?? 0),
+      tipTotal: Number(raw.tip ?? raw.tipTotal ?? 0),
+      notes: (raw.notes as string) ?? null,
+      createdAt: String(raw.createdAt ?? new Date().toISOString()),
+      customer: customer
+        ? {
+            id: String(customer.id ?? ''),
+            name: String(customer.name ?? ''),
+            phone: String(customer.phone ?? ''),
+          }
+        : null,
+      items,
+      payments: [],
+      receipts: [],
+    }
+  }
+
   const load = useCallback(async () => {
+    setLoading(true)
     try {
-      const res = await fetch('/api/pos/orders?limit=100', {
-        credentials: 'include',
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = (await res.json()) as { items?: Order[] }
-      setOrders(data.items ?? [])
+      const tasks: Array<Promise<Order[]>> = []
+      if (source === 'pos' || source === 'all') {
+        tasks.push(
+          fetch('/api/pos/orders?limit=100', { credentials: 'include' })
+            .then((r) => (r.ok ? r.json() : { items: [] }))
+            .then((d: { items?: Order[] }) => d.items ?? [])
+            .catch(() => [])
+        )
+      }
+      if (source === 'delivery' || source === 'all') {
+        tasks.push(
+          fetch('/api/orders?limit=100', { credentials: 'include' })
+            .then((r) => (r.ok ? r.json() : []))
+            .then((d) => {
+              const arr = Array.isArray(d) ? d : Array.isArray(d?.items) ? d.items : []
+              return (arr as Array<Record<string, unknown>>).map(adaptDeliveryOrder)
+            })
+            .catch(() => [])
+        )
+      }
+      const results = await Promise.all(tasks)
+      const merged = results.flat().sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      setOrders(merged)
     } catch (err) {
       toast.error(
         err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось загрузить'
@@ -128,11 +192,11 @@ export function OrdersHistoryPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [source])
 
   useEffect(() => {
     load()
-  }, [load])
+  }, [load, source])
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -239,6 +303,23 @@ export function OrdersHistoryPage() {
                   : 'Неоплаченные'}
           </button>
         ))}
+        <div className="ml-auto inline-flex rounded-md border border-border p-0.5">
+          {(['pos', 'delivery', 'all'] as const).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSource(s)}
+              className={cn(
+                'rounded px-2.5 py-1 text-xs font-medium transition',
+                source === s
+                  ? 'bg-foreground text-background'
+                  : 'text-muted-foreground hover:bg-accent'
+              )}
+            >
+              {s === 'pos' ? 'Касса' : s === 'delivery' ? 'Доставка' : 'Все источники'}
+            </button>
+          ))}
+        </div>
       </div>
 
       <main className="px-3 py-3">
