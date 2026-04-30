@@ -6,8 +6,13 @@
  *
  * Pages that need the full screen (POS terminal, KDS, customer display,
  * floor plan) are listed in `FULLSCREEN_PATHS` and bypass the sidebar.
+ *
+ * NOTE: UnifiedSidebar and UnifiedTopBar both call useSearchParams(),
+ * which forces a CSR bailout for any page that uses this shell. To keep
+ * Next.js 15 happy during static prerender we wrap them in <Suspense>
+ * boundaries so the rest of the page can still be rendered ahead of time.
  */
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { UnifiedSidebar } from './UnifiedSidebar'
@@ -20,6 +25,21 @@ const FULLSCREEN_PATHS = [
   '/pos/customer-display',
   '/pos/tables',
 ]
+
+function SidebarFallback() {
+  return (
+    <aside
+      aria-hidden
+      className="hidden lg:flex fixed left-0 top-0 z-30 h-screen w-[312px] flex-col border-r border-border bg-card"
+    />
+  )
+}
+
+function TopBarFallback() {
+  return (
+    <div className="sticky top-0 z-20 flex h-12 items-center border-b border-border bg-background/80 backdrop-blur" />
+  )
+}
 
 export function UnifiedShell({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
@@ -51,15 +71,19 @@ export function UnifiedShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <UnifiedSidebar
-        userRole={(session?.user as any)?.role}
-        onLogout={() => signOut({ callbackUrl: '/login' })}
-      />
-      <div className="ml-0 flex min-w-0 flex-1 flex-col lg:ml-[312px]">
-        <UnifiedTopBar
-          onOpenPalette={() => setPaletteOpen(true)}
-          userEmail={(session?.user as any)?.email ?? null}
+      <Suspense fallback={<SidebarFallback />}>
+        <UnifiedSidebar
+          userRole={(session?.user as { role?: string } | undefined)?.role}
+          onLogout={() => signOut({ callbackUrl: '/login' })}
         />
+      </Suspense>
+      <div className="ml-0 flex min-w-0 flex-1 flex-col lg:ml-[312px]">
+        <Suspense fallback={<TopBarFallback />}>
+          <UnifiedTopBar
+            onOpenPalette={() => setPaletteOpen(true)}
+            userEmail={(session?.user as { email?: string } | undefined)?.email ?? null}
+          />
+        </Suspense>
         <main className="min-w-0 flex-1">{children}</main>
       </div>
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />

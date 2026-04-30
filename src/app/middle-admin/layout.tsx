@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Suspense } from 'react'
 import { UnifiedShell } from '@/components/layout/UnifiedShell'
 
 /**
@@ -7,7 +8,14 @@ import { UnifiedShell } from '@/components/layout/UnifiedShell'
  * The inner page keeps its own internal tabs but they are now hierarchical
  * children of the "Operations" / "Sales" / "Finance" top-level sections via
  * deep links in src/lib/nav/structure.ts.
+ *
+ * Suspense boundary needed because AdminDashboardPage and the database
+ * page both call useSearchParams() — Next.js 15 static prerender requires it.
  */
 export default function MiddleAdminLayout({ children }: { children: ReactNode }) {
-  return <UnifiedShell>{children}</UnifiedShell>
+  return (
+    <UnifiedShell>
+      <Suspense fallback={null}>{children}</Suspense>
+    </UnifiedShell>
+  )
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { UnifiedShell } from '@/components/layout/UnifiedShell'
 
 export const metadata: Metadata = {
@@ -7,6 +8,9 @@ export const metadata: Metadata = {
 }
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
-  return <UnifiedShell>{children}</UnifiedShell>
+  return (
+    <UnifiedShell>
+      <Suspense fallback={null}>{children}</Suspense>
+    </UnifiedShell>
+  )
 }
-
