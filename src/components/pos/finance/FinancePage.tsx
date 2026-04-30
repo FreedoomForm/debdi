@@ -56,6 +56,7 @@ import {
 import { formatCurrency } from '@/lib/pos'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { Row } from '@/components/pos/shared/FormPrimitives'
 
 type Transaction = {
   id: string
@@ -749,24 +750,4 @@ export default function FinancePage() {
 }
 
 
-function Row({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: string
-  tone: 'emerald' | 'rose' | 'amber'
-}) {
-  const cls = {
-    emerald: 'text-emerald-700',
-    rose: 'text-rose-700',
-    amber: 'text-amber-700',
-  }[tone]
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className={cn('font-bold tabular-nums', cls)}>{value}</span>
-    </div>
-  )
-}
+// Row now lives in @/components/pos/shared/FormPrimitives
