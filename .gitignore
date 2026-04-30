@@ -55,3 +55,4 @@ prompt
 
 server.log
 .eslintcache
+node_modules/

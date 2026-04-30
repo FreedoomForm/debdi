@@ -26,6 +26,8 @@ import { CartPanel } from './CartPanel'
 import { PaymentDialog, type PaymentInput } from './PaymentDialog'
 import { ProductDetailDialog } from './ProductDetailDialog'
 import { CameraScanner } from './CameraScanner'
+import { CustomerPickerDialog } from './CustomerPickerDialog'
+import { TablePickerDialog } from './TablePickerDialog'
 import {
   formatCurrency,
   type PosCategory,
@@ -420,6 +422,14 @@ export function POSTerminalPage({
         currency={currency}
       />
       <CameraScanner onScan={handleScan} />
+      <CustomerPickerDialog
+        selectedId={cart.state.customerId}
+        onSelect={(id, name, phone) => cart.setCustomer(id, name, phone)}
+      />
+      <TablePickerDialog
+        selectedId={cart.state.tableId}
+        onSelect={(id, guests) => cart.setTable(id, guests)}
+      />
       {isProcessing && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-background/60 backdrop-blur-sm">
           <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 shadow-lg">
