@@ -1,120 +1,99 @@
 'use client'
 /**
- * /pos/sites — manage public storefront / subdomain sites.
+ * /pos/sites — modern website / subdomain manager.
  *
- * New UI counterpart of the legacy /middle-admin?tab=interface&sub=site
- * site builder card. Reuses /api/admin/sites endpoints.
+ * New UI counterpart of the legacy site-builder card on
+ * /middle-admin?tab=interface&sub=site. Reuses the existing
+ * /api/admin/website (GET/PUT) endpoints — no new API surface.
  *
- * Old UI preserved untouched. No redirects.
+ * Old UI is preserved untouched and remains accessible via the unified nav.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
   ArrowLeft,
+  Check,
+  Copy,
   ExternalLink,
   Globe,
   Loader2,
-  MessageCircle,
-  MessageCircleOff,
-  Pencil,
-  Plus,
+  Palette,
   RefreshCw,
-  Trash2,
+  Save,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
-type Site = {
+type StylePreset = {
   id: string
-  adminId: string
-  subdomain: string
-  theme: string
-  content: string
-  chatEnabled: boolean
-  createdAt: string
-  updatedAt: string
-  admin?: { id: string; name: string; email: string }
-}
-
-type ParsedSite = Site & {
-  themeObj: Record<string, unknown>
-  contentObj: Record<string, unknown>
-}
-
-function safeParse(raw: string): Record<string, unknown> {
-  try {
-    const v = JSON.parse(raw)
-    return v && typeof v === 'object' ? (v as Record<string, unknown>) : {}
-  } catch {
-    return {}
+  title: string
+  description: string
+  palette: {
+    pageBackground: string
+    panelBackground: string
+    accent: string
+    accentSoft: string
+    heroFrom: string
+    heroTo: string
+    textPrimary: string
   }
 }
 
-const DEFAULT_THEME = {
-  primary: '#10b981',
-  background: '#ffffff',
-  font: 'Manrope',
-}
+type RenderPage = { id: string; label: string }
 
-const DEFAULT_CONTENT_RU = {
-  ru: { title: '', description: '', heroSlogan: '' },
-  uz: { title: '', description: '', heroSlogan: '' },
-  en: { title: '', description: '', heroSlogan: '' },
+type WebsitePayload = {
+  website: {
+    id: string | null
+    subdomain: string
+    siteName: string
+    styleVariant: string
+    chatEnabled: boolean
+    style: StylePreset
+  }
+  presets: StylePreset[]
+  renderPages: RenderPage[]
+  baseHost: string
 }
 
 export default function SitesPage() {
-  const [items, setItems] = useState<ParsedSite[]>([])
+  const [data, setData] = useState<WebsitePayload | null>(null)
   const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [pendingId, setPendingId] = useState<string | null>(null)
-  const [formOpen, setFormOpen] = useState(false)
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
-  const [form, setForm] = useState({
-    id: '',
-    subdomain: '',
-    primary: DEFAULT_THEME.primary,
-    background: DEFAULT_THEME.background,
-    font: DEFAULT_THEME.font,
-    titleRu: '',
-    descriptionRu: '',
-    heroSloganRu: '',
-    titleUz: '',
-    descriptionUz: '',
-    heroSloganUz: '',
-    titleEn: '',
-    descriptionEn: '',
-    heroSloganEn: '',
-    chatEnabled: false,
-  })
+  const [saving, setSaving] = useState(false)
+
+  // Form state
+  const [subdomain, setSubdomain] = useState('')
+  const [siteName, setSiteName] = useState('')
+  const [styleVariant, setStyleVariant] = useState<string>('organic-warm')
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/admin/sites', { credentials: 'include', cache: 'no-store' })
+      const res = await fetch('/api/admin/website', {
+        credentials: 'include',
+        cache: 'no-store',
+      })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      const list = Array.isArray(data) ? data : data?.items ?? []
-      const parsed: ParsedSite[] = (list as Site[]).map((s) => ({
-        ...s,
-        themeObj: safeParse(s.theme),
-        contentObj: safeParse(s.content),
-      }))
-      setItems(parsed)
+      const payload = (await res.json()) as WebsitePayload
+      setData(payload)
+      setSubdomain(payload.website.subdomain ?? '')
+      setSiteName(payload.website.siteName ?? '')
+      setStyleVariant(payload.website.styleVariant ?? 'organic-warm')
     } catch (err) {
-      toast.error(err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось загрузить')
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось загрузить'
+      )
     } finally {
       setLoading(false)
     }
@@ -124,157 +103,58 @@ export default function SitesPage() {
     load()
   }, [load])
 
-  const openCreate = () => {
-    setFormMode('create')
-    setForm({
-      id: '',
-      subdomain: '',
-      primary: DEFAULT_THEME.primary,
-      background: DEFAULT_THEME.background,
-      font: DEFAULT_THEME.font,
-      titleRu: '',
-      descriptionRu: '',
-      heroSloganRu: '',
-      titleUz: '',
-      descriptionUz: '',
-      heroSloganUz: '',
-      titleEn: '',
-      descriptionEn: '',
-      heroSloganEn: '',
-      chatEnabled: false,
-    })
-    setFormOpen(true)
-  }
-
-  const openEdit = (s: ParsedSite) => {
-    const theme = s.themeObj as Record<string, string>
-    const content = s.contentObj as Record<string, Record<string, string>>
-    const ru = content.ru ?? {}
-    const uz = content.uz ?? {}
-    const en = content.en ?? {}
-    setFormMode('edit')
-    setForm({
-      id: s.id,
-      subdomain: s.subdomain,
-      primary: theme.primary ?? DEFAULT_THEME.primary,
-      background: theme.background ?? DEFAULT_THEME.background,
-      font: theme.font ?? DEFAULT_THEME.font,
-      titleRu: ru.title ?? '',
-      descriptionRu: ru.description ?? '',
-      heroSloganRu: ru.heroSlogan ?? '',
-      titleUz: uz.title ?? '',
-      descriptionUz: uz.description ?? '',
-      heroSloganUz: uz.heroSlogan ?? '',
-      titleEn: en.title ?? '',
-      descriptionEn: en.description ?? '',
-      heroSloganEn: en.heroSlogan ?? '',
-      chatEnabled: s.chatEnabled,
-    })
-    setFormOpen(true)
-  }
-
-  const submit = async () => {
-    if (!form.subdomain || !/^[a-z0-9-]+$/.test(form.subdomain)) {
-      toast.error('Поддомен может содержать только a-z, 0-9, дефисы')
+  const save = async () => {
+    if (!subdomain || subdomain.length < 3) {
+      toast.error('Поддомен должен содержать минимум 3 символа')
       return
     }
-    setSubmitting(true)
+    setSaving(true)
     try {
-      const payload = {
-        subdomain: form.subdomain,
-        theme: {
-          primary: form.primary,
-          background: form.background,
-          font: form.font,
-        },
-        content: {
-          ru: {
-            title: form.titleRu,
-            description: form.descriptionRu,
-            heroSlogan: form.heroSloganRu,
-          },
-          uz: {
-            title: form.titleUz,
-            description: form.descriptionUz,
-            heroSlogan: form.heroSloganUz,
-          },
-          en: {
-            title: form.titleEn,
-            description: form.descriptionEn,
-            heroSlogan: form.heroSloganEn,
-          },
-        },
-        chatEnabled: form.chatEnabled,
-      }
-      const res = await fetch(
-        formMode === 'create' ? '/api/admin/sites' : `/api/admin/sites/${form.id}`,
-        {
-          method: formMode === 'create' ? 'POST' : 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        }
-      )
+      const res = await fetch('/api/admin/website', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ subdomain, siteName, styleVariant }),
+      })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error ?? `HTTP ${res.status}`)
       }
-      toast.success(formMode === 'create' ? 'Сайт создан' : 'Сохранено')
-      setFormOpen(false)
+      const result = await res.json()
+      toast.success('Сайт сохранён')
+      // Refresh to pick up server-canonical state
       await load()
+      // If hostUrl was returned, surface it
+      if (result?.urls?.pathUrl) {
+        toast.success(`Доступен по ${result.urls.pathUrl}`, { duration: 5000 })
+      }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Не удалось')
+      toast.error(err instanceof Error ? err.message : 'Не удалось сохранить')
     } finally {
-      setSubmitting(false)
+      setSaving(false)
     }
   }
 
-  const remove = async (s: ParsedSite) => {
-    if (!confirm(`Удалить сайт ${s.subdomain}? Действие необратимо.`)) return
-    setPendingId(s.id)
-    try {
-      const res = await fetch(`/api/admin/sites/${s.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      toast.success('Удалено')
-      await load()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Не удалось')
-    } finally {
-      setPendingId(null)
-    }
-  }
+  const pathUrl = useMemo(
+    () => (subdomain ? `/sites/${subdomain}` : null),
+    [subdomain]
+  )
+  const hostUrl = useMemo(() => {
+    if (!subdomain || !data?.baseHost) return null
+    const proto = data.baseHost.startsWith('localhost') ? 'http' : 'https'
+    return `${proto}://${subdomain}.${data.baseHost}`
+  }, [subdomain, data?.baseHost])
 
-  const toggleChat = async (s: ParsedSite) => {
-    setPendingId(s.id)
-    try {
-      const res = await fetch(`/api/admin/sites/${s.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ chatEnabled: !s.chatEnabled }),
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      await load()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Не удалось')
-    } finally {
-      setPendingId(null)
+  const copy = (text: string, label: string) => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) {
+      toast.error('Буфер обмена недоступен')
+      return
     }
+    navigator.clipboard.writeText(text).then(
+      () => toast.success(`${label} скопировано`),
+      () => toast.error('Не удалось скопировать')
+    )
   }
-
-  const stats = useMemo(() => {
-    return {
-      total: items.length,
-      withChat: items.filter((s) => s.chatEnabled).length,
-      lastUpdated: items.reduce<string | null>(
-        (max, s) => (max && new Date(max) > new Date(s.updatedAt) ? max : s.updatedAt),
-        null
-      ),
-    }
-  }, [items])
 
   return (
     <div className="min-h-screen bg-background">
@@ -286,356 +166,276 @@ export default function SitesPage() {
             </Link>
           </Button>
           <Globe className="h-4 w-4 text-cyan-500" />
-          <h1 className="text-sm font-semibold">Сайты-витрины</h1>
-          <Badge variant="secondary" className="text-[10px]">
-            {items.length}
-          </Badge>
+          <h1 className="text-sm font-semibold">Сайт-витрина</h1>
+          {data?.website.subdomain && (
+            <Badge variant="secondary" className="text-[10px]">
+              {data.website.subdomain}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="mr-1 h-4 w-4" />
-            Новый сайт
-          </Button>
-          <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            <RefreshCw
+              className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
+            />
             Обновить
+          </Button>
+          <Button size="sm" onClick={save} disabled={saving}>
+            {saving ? (
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="mr-1.5 h-3.5 w-3.5" />
+            )}
+            Сохранить
           </Button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1400px] space-y-3 p-3 lg:p-4">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          <KPI label="Всего сайтов" value={String(stats.total)} tone="cyan" />
-          <KPI label="С чатом" value={String(stats.withChat)} tone="emerald" />
-          <KPI
-            label="Обновлён"
-            value={
-              stats.lastUpdated
-                ? new Date(stats.lastUpdated).toLocaleDateString('ru-RU')
-                : '—'
-            }
-            tone="neutral"
-          />
-        </div>
-
-        {loading ? (
+      <main className="mx-auto max-w-3xl space-y-4 p-4 lg:p-6">
+        {loading && !data ? (
           <div className="grid place-items-center py-20">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        ) : items.length === 0 ? (
-          <Card>
-            <CardContent className="space-y-3 py-10 text-center">
-              <Globe className="mx-auto h-10 w-10 opacity-50" />
-              <p className="text-sm text-muted-foreground">У вас ещё нет сайта-витрины</p>
-              <Button onClick={openCreate}>
-                <Plus className="mr-1 h-4 w-4" /> Создать первый сайт
-              </Button>
-            </CardContent>
-          </Card>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((s) => {
-              const theme = s.themeObj as Record<string, string>
-              const content = s.contentObj as Record<string, Record<string, string>>
-              const heroTitle = content.ru?.title ?? content.en?.title ?? content.uz?.title ?? '—'
-              const heroDesc =
-                content.ru?.description ?? content.en?.description ?? content.uz?.description ?? ''
-              const url = `https://${s.subdomain}.debdi.uz`
-              return (
-                <Card key={s.id} className="overflow-hidden">
-                  <div
-                    className="h-16"
-                    style={{
-                      background: `linear-gradient(135deg, ${theme.primary ?? DEFAULT_THEME.primary}, ${theme.background ?? DEFAULT_THEME.background})`,
-                    }}
-                  />
-                  <CardContent className="space-y-2 p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <Globe className="h-3.5 w-3.5 text-cyan-600" />
-                          <span className="truncate text-sm font-semibold">
-                            {s.subdomain}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          {s.admin?.name ?? '—'}
-                        </div>
-                      </div>
-                      <Badge
-                        variant="secondary"
-                        className={cn(
-                          'shrink-0 text-[10px]',
-                          s.chatEnabled
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-slate-100 text-slate-600'
-                        )}
-                      >
-                        {s.chatEnabled ? 'Чат вкл.' : 'Чат выкл.'}
-                      </Badge>
+          <>
+            {/* Domain & name */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Globe className="h-4 w-4 text-cyan-500" />
+                  Поддомен и название
+                </CardTitle>
+                <CardDescription>
+                  Поддомен формирует адрес вашего сайта-витрины.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                      Название сайта
+                    </Label>
+                    <Input
+                      value={siteName}
+                      onChange={(e) => setSiteName(e.target.value)}
+                      placeholder="My Restaurant"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                      Поддомен
+                    </Label>
+                    <div className="flex">
+                      <Input
+                        value={subdomain}
+                        onChange={(e) =>
+                          setSubdomain(
+                            e.target.value
+                              .toLowerCase()
+                              .replace(/[^a-z0-9-]/g, '')
+                              .slice(0, 32)
+                          )
+                        }
+                        placeholder="my-cafe"
+                        className="rounded-r-none"
+                      />
+                      <span className="grid place-items-center rounded-r-md border border-l-0 border-input bg-muted px-3 text-xs text-muted-foreground">
+                        .{data?.baseHost ?? 'debdi.uz'}
+                      </span>
                     </div>
-                    <div className="text-xs">
-                      <div className="font-medium">{heroTitle}</div>
-                      {heroDesc && (
-                        <div className="line-clamp-2 text-muted-foreground">{heroDesc}</div>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-[11px]"
-                        onClick={() => openEdit(s)}
-                      >
-                        <Pencil className="mr-1 h-3 w-3" />
-                        Изменить
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-[11px]"
-                        onClick={() => toggleChat(s)}
-                        disabled={pendingId === s.id}
-                      >
-                        {s.chatEnabled ? (
-                          <>
-                            <MessageCircleOff className="mr-1 h-3 w-3" />
-                            Выкл. чат
-                          </>
-                        ) : (
-                          <>
-                            <MessageCircle className="mr-1 h-3 w-3" />
-                            Вкл. чат
-                          </>
-                        )}
-                      </Button>
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-auto inline-flex h-7 items-center gap-1 rounded-md border border-border px-2 text-[11px] text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                        Открыть
-                      </a>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2 text-[11px] text-rose-600 hover:bg-rose-50 hover:text-rose-700"
-                        onClick={() => remove(s)}
-                        disabled={pendingId === s.id}
-                      >
-                        {pendingId === s.id ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        )}
-
-        <Card className="border-dashed">
-          <CardContent className="flex items-start gap-3 p-3 text-xs text-muted-foreground">
-            <Globe className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
-              Старый билдер сайтов остаётся доступным:{' '}
-              <a
-                href="/middle-admin?tab=interface&sub=site"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                /middle-admin?tab=interface&sub=site
-              </a>
-              . Эта страница использует те же данные модели Website и добавляет
-              мульти-локализацию (ru/uz/en), цветовую тему и быстрое управление чатом.
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {formMode === 'create' ? 'Создать сайт-витрину' : 'Изменить сайт-витрину'}
-            </DialogTitle>
-            <CardDescription className="text-xs">
-              Поддомен будет доступен по адресу{' '}
-              <span className="font-mono">{form.subdomain || '<subdomain>'}.debdi.uz</span>
-            </CardDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <Label className="text-xs">Поддомен</Label>
-              <Input
-                value={form.subdomain}
-                onChange={(e) =>
-                  setForm({ ...form, subdomain: e.target.value.toLowerCase().trim() })
-                }
-                placeholder="healthy-food"
-                disabled={formMode === 'edit'}
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Основной цвет</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={form.primary}
-                  onChange={(e) => setForm({ ...form, primary: e.target.value })}
-                  className="h-9 w-12 cursor-pointer rounded border border-input"
-                />
-                <Input
-                  value={form.primary}
-                  onChange={(e) => setForm({ ...form, primary: e.target.value })}
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs">Фон</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={form.background}
-                  onChange={(e) => setForm({ ...form, background: e.target.value })}
-                  className="h-9 w-12 cursor-pointer rounded border border-input"
-                />
-                <Input
-                  value={form.background}
-                  onChange={(e) => setForm({ ...form, background: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="col-span-2">
-              <Label className="text-xs">Шрифт</Label>
-              <Input
-                value={form.font}
-                onChange={(e) => setForm({ ...form, font: e.target.value })}
-                placeholder="Manrope"
-              />
-            </div>
-            <div className="col-span-2 mt-1">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                🇷🇺 Русский
-              </Label>
-              <div className="mt-1 grid gap-2">
-                <Input
-                  value={form.titleRu}
-                  onChange={(e) => setForm({ ...form, titleRu: e.target.value })}
-                  placeholder="Заголовок (RU)"
-                />
-                <Input
-                  value={form.heroSloganRu}
-                  onChange={(e) => setForm({ ...form, heroSloganRu: e.target.value })}
-                  placeholder="Слоган (RU)"
-                />
-                <textarea
-                  value={form.descriptionRu}
-                  onChange={(e) => setForm({ ...form, descriptionRu: e.target.value })}
-                  placeholder="Описание (RU)"
-                  rows={2}
-                  className="resize-y rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-            </div>
-            <div className="col-span-2">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                🇺🇿 O'zbekcha
-              </Label>
-              <div className="mt-1 grid gap-2">
-                <Input
-                  value={form.titleUz}
-                  onChange={(e) => setForm({ ...form, titleUz: e.target.value })}
-                  placeholder="Sarlavha (UZ)"
-                />
-                <Input
-                  value={form.heroSloganUz}
-                  onChange={(e) => setForm({ ...form, heroSloganUz: e.target.value })}
-                  placeholder="Slogan (UZ)"
-                />
-                <textarea
-                  value={form.descriptionUz}
-                  onChange={(e) => setForm({ ...form, descriptionUz: e.target.value })}
-                  placeholder="Tavsif (UZ)"
-                  rows={2}
-                  className="resize-y rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-            </div>
-            <div className="col-span-2">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                🇬🇧 English
-              </Label>
-              <div className="mt-1 grid gap-2">
-                <Input
-                  value={form.titleEn}
-                  onChange={(e) => setForm({ ...form, titleEn: e.target.value })}
-                  placeholder="Title (EN)"
-                />
-                <Input
-                  value={form.heroSloganEn}
-                  onChange={(e) => setForm({ ...form, heroSloganEn: e.target.value })}
-                  placeholder="Slogan (EN)"
-                />
-                <textarea
-                  value={form.descriptionEn}
-                  onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })}
-                  placeholder="Description (EN)"
-                  rows={2}
-                  className="resize-y rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-            </div>
-            <div className="col-span-2 flex items-center gap-2 rounded-md border border-border bg-muted/30 p-2">
-              <Switch
-                checked={form.chatEnabled}
-                onCheckedChange={(v) => setForm({ ...form, chatEnabled: v })}
-              />
-              <div className="flex-1">
-                <div className="text-sm font-medium">Чат для клиентов</div>
-                <div className="text-[11px] text-muted-foreground">
-                  Разрешить клиентам общаться через витрину
+                    <p className="mt-1 text-[10px] text-muted-foreground">
+                      3–32 символа, латиница, цифры, дефис.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setFormOpen(false)}>
-              Отмена
-            </Button>
-            <Button onClick={submit} disabled={submitting}>
-              {submitting ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-              {formMode === 'create' ? 'Создать' : 'Сохранить'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+                {/* URL preview */}
+                {(pathUrl || hostUrl) && (
+                  <div className="space-y-1.5 rounded-md border border-border bg-muted/30 p-2">
+                    {pathUrl && (
+                      <UrlRow
+                        label="Path URL"
+                        url={pathUrl}
+                        href={pathUrl}
+                        onCopy={() => copy(pathUrl, 'Path URL')}
+                      />
+                    )}
+                    {hostUrl && (
+                      <UrlRow
+                        label="Subdomain URL"
+                        url={hostUrl}
+                        href={hostUrl}
+                        onCopy={() => copy(hostUrl, 'URL')}
+                      />
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Style picker */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Palette className="h-4 w-4 text-cyan-500" />
+                  Стиль оформления
+                </CardTitle>
+                <CardDescription>
+                  Выберите тему — цвета, типографика и hero-блок применяются автоматически.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+                  {(data?.presets ?? []).map((preset) => {
+                    const active = preset.id === styleVariant
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => setStyleVariant(preset.id)}
+                        className={cn(
+                          'group flex flex-col gap-2 rounded-xl border p-3 text-left transition',
+                          active
+                            ? 'border-cyan-500 ring-2 ring-cyan-200'
+                            : 'border-border hover:border-cyan-300'
+                        )}
+                      >
+                        {/* Palette preview */}
+                        <div
+                          className="h-20 w-full overflow-hidden rounded-md"
+                          style={{
+                            background: `linear-gradient(135deg, ${preset.palette.heroFrom}, ${preset.palette.heroTo})`,
+                          }}
+                        >
+                          <div
+                            className="m-2 h-3 w-12 rounded-full"
+                            style={{ background: preset.palette.accent }}
+                          />
+                          <div
+                            className="m-2 h-2 w-20 rounded-full opacity-70"
+                            style={{ background: preset.palette.textPrimary }}
+                          />
+                          <div
+                            className="m-2 h-2 w-16 rounded-full opacity-50"
+                            style={{ background: preset.palette.textPrimary }}
+                          />
+                        </div>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="text-sm font-semibold">{preset.title}</div>
+                            <div className="line-clamp-2 text-[11px] text-muted-foreground">
+                              {preset.description}
+                            </div>
+                          </div>
+                          {active && (
+                            <Check className="h-4 w-4 shrink-0 text-cyan-600" />
+                          )}
+                        </div>
+                        {/* Color swatches */}
+                        <div className="flex gap-1">
+                          {[
+                            preset.palette.accent,
+                            preset.palette.accentSoft,
+                            preset.palette.pageBackground,
+                            preset.palette.panelBackground,
+                          ].map((c, i) => (
+                            <span
+                              key={i}
+                              className="h-3 w-3 rounded-full border border-border"
+                              style={{ background: c }}
+                            />
+                          ))}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Render pages list */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Sparkles className="h-4 w-4 text-cyan-500" />
+                  Доступные страницы
+                </CardTitle>
+                <CardDescription>
+                  Эти страницы автоматически генерируются для каждого поддомена.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {(data?.renderPages ?? []).map((p) => (
+                    <Link
+                      key={p.id}
+                      href={subdomain ? `/sites/${subdomain}` : '#'}
+                      className="rounded-full border border-border bg-card px-3 py-1 text-xs hover:bg-accent"
+                    >
+                      {p.label}
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Legacy pointer */}
+            <Card className="border-dashed">
+              <CardContent className="flex items-start gap-3 p-3 text-xs text-muted-foreground">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                  Расширенный билдер (AI-редактор контента, превью каждой
+                  страницы, стиль-варианты по разделам) доступен в старом
+                  интерфейсе:{' '}
+                  <a
+                    href="/middle-admin?tab=interface&sub=site"
+                    className="font-medium text-primary underline-offset-2 hover:underline"
+                  >
+                    /middle-admin?tab=interface&sub=site
+                  </a>
+                  . Новые и старые настройки синхронизированы — изменения
+                  отражаются в обеих UI.
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </main>
     </div>
   )
 }
 
-function KPI({
+function UrlRow({
   label,
-  value,
-  tone,
+  url,
+  href,
+  onCopy,
 }: {
   label: string
-  value: string
-  tone: 'cyan' | 'emerald' | 'neutral'
+  url: string
+  href: string
+  onCopy: () => void
 }) {
-  const cls = {
-    cyan: 'border-cyan-200 bg-cyan-50/60 text-cyan-900',
-    emerald: 'border-emerald-200 bg-emerald-50/60 text-emerald-900',
-    neutral: 'border-border bg-card text-foreground',
-  }[tone]
   return (
-    <div className={cn('rounded-lg border p-2 shadow-sm', cls)}>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="mt-0.5 text-base font-bold tabular-nums">{value}</div>
+    <div className="flex items-center gap-2 text-xs">
+      <span className="w-28 shrink-0 text-muted-foreground">{label}</span>
+      <code className="min-w-0 flex-1 truncate rounded bg-card px-2 py-1 text-[11px]">
+        {url}
+      </code>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="h-7 w-7"
+        onClick={onCopy}
+        title="Скопировать"
+      >
+        <Copy className="h-3.5 w-3.5" />
+      </Button>
+      <Button asChild size="icon" variant="ghost" className="h-7 w-7" title="Открыть">
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          <ExternalLink className="h-3.5 w-3.5" />
+        </a>
+      </Button>
     </div>
   )
 }
