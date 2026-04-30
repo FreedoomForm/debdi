@@ -582,6 +582,12 @@ model OrderItem {
   total     Float // (unitPrice * quantity) - discount + tax
   modifiers Json? // Snapshot of selected modifiers
   notes     String?
+  // Course pacing & KDS fire timer (inspired by Toast / Lightspeed Mar-2026):
+  courseNumber Int?    // 1=appetizer, 2=main, 3=dessert, etc. NULL = not coursed.
+  firedAt   DateTime? // Set when KDS picks the item up. Powers the
+                      // 'time since fired' badge that turns amber/red on
+                      // delays. NULL = not fired yet.
+  readyAt   DateTime? // Set when item is bumped to 'ready' on KDS.
   createdAt DateTime @default(now())
 
   @@index([orderId])
@@ -633,6 +639,11 @@ model RestaurantTable {
   height         Float         @default(80)
   status         TableStatus   @default(AVAILABLE)
   currentOrderId String?
+  // QR-ordering: opaque random token printed on the table sticker.
+  // The public URL /t/<qrToken> renders a guest-facing menu and lets the
+  // diner add to cart from their phone without staff intervention.
+  qrToken        String?       @unique
+  qrEnabled      Boolean       @default(false)
   reservations   Reservation[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
