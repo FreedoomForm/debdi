@@ -13,11 +13,6 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/admin/AdminDashboardPage.tsx"
   },
   {
-    "name": "AdminLayout",
-    "purpose": "UI component from components layout AdminLayout",
-    "source": "components/layout/AdminLayout.tsx"
-  },
-  {
     "name": "AdminsTab",
     "purpose": "UI component from components admin dashboard tabs content AdminsTab",
     "source": "components/admin/dashboard/tabs-content/AdminsTab.tsx"
@@ -38,6 +33,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/admin/dashboard/AllowedTabsPicker.tsx"
   },
   {
+    "name": "animated-input",
+    "purpose": "UI component from components smoothui smoothui animated input index",
+    "source": "components/smoothui/smoothui/animated-input/index.tsx"
+  },
+  {
     "name": "aspect-ratio",
     "purpose": "UI component from components ui aspect ratio",
     "source": "components/ui/aspect-ratio.tsx"
@@ -56,6 +56,21 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "badge",
     "purpose": "UI component from components ui badge",
     "source": "components/ui/badge.tsx"
+  },
+  {
+    "name": "basic-dropdown",
+    "purpose": "UI component from components smoothui smoothui basic dropdown index",
+    "source": "components/smoothui/smoothui/basic-dropdown/index.tsx"
+  },
+  {
+    "name": "basic-modal",
+    "purpose": "UI component from components smoothui smoothui basic modal index",
+    "source": "components/smoothui/smoothui/basic-modal/index.tsx"
+  },
+  {
+    "name": "BranchesPage",
+    "purpose": "UI component from components pos branches BranchesPage",
+    "source": "components/pos/branches/BranchesPage.tsx"
   },
   {
     "name": "breadcrumb",
@@ -83,6 +98,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/admin/dashboard/shared/CalendarRangeSelector.tsx"
   },
   {
+    "name": "CalendarView",
+    "purpose": "UI component from components CalendarView",
+    "source": "components/CalendarView.tsx"
+  },
+  {
+    "name": "CameraScanner",
+    "purpose": "UI component from components pos terminal CameraScanner",
+    "source": "components/pos/terminal/CameraScanner.tsx"
+  },
+  {
     "name": "card",
     "purpose": "UI component from components ui card",
     "source": "components/ui/card.tsx"
@@ -91,6 +116,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "carousel",
     "purpose": "UI component from components ui carousel",
     "source": "components/ui/carousel.tsx"
+  },
+  {
+    "name": "CartPanel",
+    "purpose": "UI component from components pos terminal CartPanel",
+    "source": "components/pos/terminal/CartPanel.tsx"
+  },
+  {
+    "name": "CategoriesManagerPage",
+    "purpose": "UI component from components pos products CategoriesManagerPage",
+    "source": "components/pos/products/CategoriesManagerPage.tsx"
   },
   {
     "name": "ChangePasswordModal",
@@ -138,6 +173,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/ui/command.tsx"
   },
   {
+    "name": "CommandPalette",
+    "purpose": "UI component from components layout CommandPalette",
+    "source": "components/layout/CommandPalette.tsx"
+  },
+  {
     "name": "context-menu",
     "purpose": "UI component from components ui context menu",
     "source": "components/ui/context-menu.tsx"
@@ -163,6 +203,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/collaboration/Cursors.tsx"
   },
   {
+    "name": "CustomerDisplayPage",
+    "purpose": "UI component from components pos customer display CustomerDisplayPage",
+    "source": "components/pos/customer-display/CustomerDisplayPage.tsx"
+  },
+  {
+    "name": "CustomerPickerDialog",
+    "purpose": "UI component from components pos terminal CustomerPickerDialog",
+    "source": "components/pos/terminal/CustomerPickerDialog.tsx"
+  },
+  {
     "name": "DesktopTabsNav",
     "purpose": "UI component from components admin dashboard DesktopTabsNav",
     "source": "components/admin/dashboard/DesktopTabsNav.tsx"
@@ -171,6 +221,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "dialog",
     "purpose": "UI component from components ui dialog",
     "source": "components/ui/dialog.tsx"
+  },
+  {
+    "name": "DiscountsPage",
+    "purpose": "UI component from components pos discounts DiscountsPage",
+    "source": "components/pos/discounts/DiscountsPage.tsx"
   },
   {
     "name": "DishesManager",
@@ -196,6 +251,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "dropdown-menu",
     "purpose": "UI component from components ui dropdown menu",
     "source": "components/ui/dropdown-menu.tsx"
+  },
+  {
+    "name": "EmployeesPage",
+    "purpose": "UI component from components pos employees EmployeesPage",
+    "source": "components/pos/employees/EmployeesPage.tsx"
   },
   {
     "name": "EntityStatusBadge",
@@ -238,6 +298,21 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/admin/dashboard/shared/FormField.tsx"
   },
   {
+    "name": "GiftCardsPage",
+    "purpose": "UI component from components pos gift cards GiftCardsPage",
+    "source": "components/pos/gift-cards/GiftCardsPage.tsx"
+  },
+  {
+    "name": "GourmetButton",
+    "purpose": "UI component from components GourmetButton",
+    "source": "components/GourmetButton.tsx"
+  },
+  {
+    "name": "GourmetCard",
+    "purpose": "UI component from components GourmetCard",
+    "source": "components/GourmetCard.tsx"
+  },
+  {
     "name": "HistoryTable",
     "purpose": "UI component from components admin HistoryTable",
     "source": "components/admin/HistoryTable.tsx"
@@ -273,6 +348,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/admin/InterfaceSettings.tsx"
   },
   {
+    "name": "InventoryPage",
+    "purpose": "UI component from components pos inventory InventoryPage",
+    "source": "components/pos/inventory/InventoryPage.tsx"
+  },
+  {
+    "name": "KDSPage",
+    "purpose": "UI component from components pos kds KDSPage",
+    "source": "components/pos/kds/KDSPage.tsx"
+  },
+  {
     "name": "label",
     "purpose": "UI component from components ui label",
     "source": "components/ui/label.tsx"
@@ -281,6 +366,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "LanguageSwitcher",
     "purpose": "UI component from components LanguageSwitcher",
     "source": "components/LanguageSwitcher.tsx"
+  },
+  {
+    "name": "LiveStrip",
+    "purpose": "UI component from components pos dashboard LiveStrip",
+    "source": "components/pos/dashboard/LiveStrip.tsx"
+  },
+  {
+    "name": "LoyaltyPage",
+    "purpose": "UI component from components pos loyalty LoyaltyPage",
+    "source": "components/pos/loyalty/LoyaltyPage.tsx"
   },
   {
     "name": "menubar",
@@ -298,14 +393,9 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/admin/dashboard/shared/MiniLocationPickerMap.tsx"
   },
   {
-    "name": "MobileHeader",
-    "purpose": "UI component from components layout MobileHeader",
-    "source": "components/layout/MobileHeader.tsx"
-  },
-  {
-    "name": "MobileSidebar",
-    "purpose": "UI component from components MobileSidebar",
-    "source": "components/MobileSidebar.tsx"
+    "name": "MobileBottomTabsNav",
+    "purpose": "UI component from components admin dashboard MobileBottomTabsNav",
+    "source": "components/admin/dashboard/MobileBottomTabsNav.tsx"
   },
   {
     "name": "MobileTabIndicator",
@@ -318,9 +408,19 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/ui/navigation-menu.tsx"
   },
   {
+    "name": "number-flow",
+    "purpose": "UI component from components smoothui smoothui number flow index",
+    "source": "components/smoothui/smoothui/number-flow/index.tsx"
+  },
+  {
     "name": "OrderModal",
     "purpose": "UI component from components admin dashboard modals OrderModal",
     "source": "components/admin/dashboard/modals/OrderModal.tsx"
+  },
+  {
+    "name": "OrdersHistoryPage",
+    "purpose": "UI component from components pos orders OrdersHistoryPage",
+    "source": "components/pos/orders/OrdersHistoryPage.tsx"
   },
   {
     "name": "OrdersTable",
@@ -338,9 +438,44 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/ui/pagination.tsx"
   },
   {
+    "name": "PaymentDialog",
+    "purpose": "UI component from components pos terminal PaymentDialog",
+    "source": "components/pos/terminal/PaymentDialog.tsx"
+  },
+  {
     "name": "popover",
     "purpose": "UI component from components ui popover",
     "source": "components/ui/popover.tsx"
+  },
+  {
+    "name": "POSDashboardPage",
+    "purpose": "UI component from components pos dashboard POSDashboardPage",
+    "source": "components/pos/dashboard/POSDashboardPage.tsx"
+  },
+  {
+    "name": "POSTerminalPage",
+    "purpose": "UI component from components pos terminal POSTerminalPage",
+    "source": "components/pos/terminal/POSTerminalPage.tsx"
+  },
+  {
+    "name": "PrintersPage",
+    "purpose": "UI component from components pos printers PrintersPage",
+    "source": "components/pos/printers/PrintersPage.tsx"
+  },
+  {
+    "name": "ProductDetailDialog",
+    "purpose": "UI component from components pos terminal ProductDetailDialog",
+    "source": "components/pos/terminal/ProductDetailDialog.tsx"
+  },
+  {
+    "name": "ProductGrid",
+    "purpose": "UI component from components pos terminal ProductGrid",
+    "source": "components/pos/terminal/ProductGrid.tsx"
+  },
+  {
+    "name": "ProductsManagerPage",
+    "purpose": "UI component from components pos products ProductsManagerPage",
+    "source": "components/pos/products/ProductsManagerPage.tsx"
   },
   {
     "name": "progress",
@@ -366,6 +501,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "RefreshIconButton",
     "purpose": "UI component from components admin dashboard shared RefreshIconButton",
     "source": "components/admin/dashboard/shared/RefreshIconButton.tsx"
+  },
+  {
+    "name": "ReportsPage",
+    "purpose": "UI component from components pos reports ReportsPage",
+    "source": "components/pos/reports/ReportsPage.tsx"
+  },
+  {
+    "name": "ReservationsPage",
+    "purpose": "UI component from components pos reservations ReservationsPage",
+    "source": "components/pos/reservations/ReservationsPage.tsx"
   },
   {
     "name": "resizable",
@@ -413,9 +558,19 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/ServiceWorkerRegistration.tsx"
   },
   {
+    "name": "SessionProviderClient",
+    "purpose": "UI component from components providers SessionProviderClient",
+    "source": "components/providers/SessionProviderClient.tsx"
+  },
+  {
     "name": "SetsTab",
     "purpose": "UI component from components admin SetsTab",
     "source": "components/admin/SetsTab.tsx"
+  },
+  {
+    "name": "SettingsPage",
+    "purpose": "UI component from components pos settings SettingsPage",
+    "source": "components/pos/settings/SettingsPage.tsx"
   },
   {
     "name": "sheet",
@@ -428,14 +583,14 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/excel/Sheet.tsx"
   },
   {
+    "name": "ShiftPage",
+    "purpose": "UI component from components pos shift ShiftPage",
+    "source": "components/pos/shift/ShiftPage.tsx"
+  },
+  {
     "name": "sidebar",
     "purpose": "UI component from components ui sidebar",
     "source": "components/ui/sidebar.tsx"
-  },
-  {
-    "name": "Sidebar",
-    "purpose": "UI component from components layout Sidebar",
-    "source": "components/layout/Sidebar.tsx"
   },
   {
     "name": "SiteAuthShell",
@@ -473,6 +628,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "source": "components/ui/slider.tsx"
   },
   {
+    "name": "smoothui",
+    "purpose": "UI component from components smoothui index",
+    "source": "components/smoothui/index.ts"
+  },
+  {
     "name": "sonner",
     "purpose": "UI component from components ui sonner",
     "source": "components/ui/sonner.tsx"
@@ -481,6 +641,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "StatsCards",
     "purpose": "UI component from components admin StatsCards",
     "source": "components/admin/StatsCards.tsx"
+  },
+  {
+    "name": "SuppliersPage",
+    "purpose": "UI component from components pos suppliers SuppliersPage",
+    "source": "components/pos/suppliers/SuppliersPage.tsx"
   },
   {
     "name": "switch",
@@ -501,6 +666,16 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "table",
     "purpose": "UI component from components ui table",
     "source": "components/ui/table.tsx"
+  },
+  {
+    "name": "TablePickerDialog",
+    "purpose": "UI component from components pos terminal TablePickerDialog",
+    "source": "components/pos/terminal/TablePickerDialog.tsx"
+  },
+  {
+    "name": "TablesPage",
+    "purpose": "UI component from components pos tables TablesPage",
+    "source": "components/pos/tables/TablesPage.tsx"
   },
   {
     "name": "tabMeta",
@@ -531,6 +706,11 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "textarea",
     "purpose": "UI component from components ui textarea",
     "source": "components/ui/textarea.tsx"
+  },
+  {
+    "name": "TimeclockPage",
+    "purpose": "UI component from components pos timeclock TimeclockPage",
+    "source": "components/pos/timeclock/TimeclockPage.tsx"
   },
   {
     "name": "toast",
@@ -576,6 +756,26 @@ export const SITE_UI_COMPONENT_CATALOG = [
     "name": "types",
     "purpose": "UI component from components admin dashboard types",
     "source": "components/admin/dashboard/types.ts"
+  },
+  {
+    "name": "typewriter-text",
+    "purpose": "UI component from components smoothui smoothui typewriter text index",
+    "source": "components/smoothui/smoothui/typewriter-text/index.tsx"
+  },
+  {
+    "name": "UnifiedShell",
+    "purpose": "UI component from components layout UnifiedShell",
+    "source": "components/layout/UnifiedShell.tsx"
+  },
+  {
+    "name": "UnifiedSidebar",
+    "purpose": "UI component from components layout UnifiedSidebar",
+    "source": "components/layout/UnifiedSidebar.tsx"
+  },
+  {
+    "name": "use-cart",
+    "purpose": "UI component from components pos terminal use cart",
+    "source": "components/pos/terminal/use-cart.ts"
   },
   {
     "name": "useDashboardData",
@@ -636,6 +836,94 @@ export const SITE_UI_PAGE_CATALOG = [
   {
     "path": "/offline",
     "purpose": "Interactive page at /offline"
+  },
+  {
+    "path": "/pos",
+    "purpose": "Interactive page at /pos"
+  },
+  {
+    "path": "/pos/branches",
+    "purpose": "Interactive page at /pos/branches"
+  },
+  {
+    "path": "/pos/categories",
+    "purpose": "Interactive page at /pos/categories"
+  },
+  {
+    "path": "/pos/customer-display",
+    "purpose": "Interactive page at /pos/customer-display"
+  },
+  {
+    "path": "/pos/dashboard",
+    "purpose": "Interactive page at /pos/dashboard"
+  },
+  {
+    "path": "/pos/discounts",
+    "purpose": "Interactive page at /pos/discounts"
+  },
+  {
+    "path": "/pos/employees",
+    "purpose": "Interactive page at /pos/employees"
+  },
+  {
+    "path": "/pos/gift-cards",
+    "purpose": "Interactive page at /pos/gift-cards"
+  },
+  {
+    "path": "/pos/inventory",
+    "purpose": "Interactive page at /pos/inventory"
+  },
+  {
+    "path": "/pos/kds",
+    "purpose": "Interactive page at /pos/kds"
+  },
+  {
+    "path": "/pos/loyalty",
+    "purpose": "Interactive page at /pos/loyalty"
+  },
+  {
+    "path": "/pos/orders",
+    "purpose": "Interactive page at /pos/orders"
+  },
+  {
+    "path": "/pos/printers",
+    "purpose": "Interactive page at /pos/printers"
+  },
+  {
+    "path": "/pos/products",
+    "purpose": "Interactive page at /pos/products"
+  },
+  {
+    "path": "/pos/reports",
+    "purpose": "Interactive page at /pos/reports"
+  },
+  {
+    "path": "/pos/reservations",
+    "purpose": "Interactive page at /pos/reservations"
+  },
+  {
+    "path": "/pos/settings",
+    "purpose": "Interactive page at /pos/settings"
+  },
+  {
+    "path": "/pos/shift",
+    "purpose": "Interactive page at /pos/shift"
+  },
+  {
+    "path": "/pos/suppliers",
+    "purpose": "Interactive page at /pos/suppliers"
+  },
+  {
+    "path": "/pos/tables",
+    "purpose": "Interactive page at /pos/tables"
+  },
+  {
+    "path": "/pos/terminal",
+    "purpose": "Interactive page at /pos/terminal"
+  },
+  {
+    "path": "/pos/timeclock",
+    "purpose": "Interactive page at /pos/timeclock"
   },
   {
     "path": "/signup",

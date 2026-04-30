@@ -594,6 +594,13 @@ export const SITE_ENDPOINT_CATALOG = [
     "description": "stats endpoint (GET)."
   },
   {
+    "path": "/api/courier/withdraw",
+    "methods": [
+      "POST"
+    ],
+    "description": "withdraw endpoint (POST)."
+  },
+  {
     "path": "/api/cron/check-trials",
     "methods": [
       "GET"
@@ -686,6 +693,253 @@ export const SITE_ENDPOINT_CATALOG = [
       "PATCH"
     ],
     "description": "Order details/update."
+  },
+  {
+    "path": "/api/pos/branches",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "branches endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/cash-drawer",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "cash drawer endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/categories",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "categories endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/categories/[id]",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "dynamic route endpoint (PATCH/DELETE)."
+  },
+  {
+    "path": "/api/pos/categories/reorder",
+    "methods": [
+      "POST"
+    ],
+    "description": "reorder endpoint (POST)."
+  },
+  {
+    "path": "/api/pos/customers/search",
+    "methods": [
+      "GET"
+    ],
+    "description": "search endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/dashboard/live",
+    "methods": [
+      "GET"
+    ],
+    "description": "live endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/discounts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "discounts endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/employees",
+    "methods": [
+      "GET"
+    ],
+    "description": "employees endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/gift-cards",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "gift cards endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/gift-cards/[code]/redeem",
+    "methods": [
+      "POST"
+    ],
+    "description": "redeem endpoint (POST)."
+  },
+  {
+    "path": "/api/pos/inventory/movements",
+    "methods": [
+      "GET"
+    ],
+    "description": "movements endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/kds",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "kds endpoint (GET/PATCH)."
+  },
+  {
+    "path": "/api/pos/loyalty",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "loyalty endpoint (GET/PATCH)."
+  },
+  {
+    "path": "/api/pos/notifications",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "description": "notifications endpoint (GET/PATCH)."
+  },
+  {
+    "path": "/api/pos/orders",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "orders endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/orders/[orderId]",
+    "methods": [
+      "GET"
+    ],
+    "description": "dynamic route endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/orders/[orderId]/refund",
+    "methods": [
+      "POST"
+    ],
+    "description": "refund endpoint (POST)."
+  },
+  {
+    "path": "/api/pos/printers",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "printers endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/products",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "products endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/products/[id]",
+    "methods": [
+      "GET",
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "dynamic route endpoint (GET/PATCH/DELETE)."
+  },
+  {
+    "path": "/api/pos/products/import",
+    "methods": [
+      "POST"
+    ],
+    "description": "import endpoint (POST)."
+  },
+  {
+    "path": "/api/pos/purchase-orders",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "purchase orders endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/purchase-orders/[id]/receive",
+    "methods": [
+      "POST"
+    ],
+    "description": "receive endpoint (POST)."
+  },
+  {
+    "path": "/api/pos/receipts/[receiptNumber]/print",
+    "methods": [
+      "GET"
+    ],
+    "description": "print endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/reports/sales",
+    "methods": [
+      "GET"
+    ],
+    "description": "sales endpoint (GET)."
+  },
+  {
+    "path": "/api/pos/reservations",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "reservations endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/shifts",
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH"
+    ],
+    "description": "shifts endpoint (GET/POST/PATCH)."
+  },
+  {
+    "path": "/api/pos/suppliers",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "suppliers endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/tables",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "tables endpoint (GET/POST)."
+  },
+  {
+    "path": "/api/pos/tables/[id]",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "description": "dynamic route endpoint (PATCH/DELETE)."
+  },
+  {
+    "path": "/api/pos/timeclock",
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH"
+    ],
+    "description": "timeclock endpoint (GET/POST/PATCH)."
   },
   {
     "path": "/api/sites/[subdomain]",
