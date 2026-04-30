@@ -20,6 +20,10 @@ type FetchApiOptions<TBody = unknown> = {
   body?: TBody
   headers?: Record<string, string>
   signal?: AbortSignal
+  /** Defaults to 'include' so authenticated POS routes work out of the box. */
+  credentials?: RequestCredentials
+  /** Defaults to 'no-store' for GETs so polling sees fresh data. */
+  cache?: RequestCache
 }
 
 type ErrorPayload = {
@@ -48,7 +52,7 @@ export async function fetchApi<T = unknown, TBody = unknown>(
   url: string,
   options?: FetchApiOptions<TBody>
 ): Promise<ApiResult<T>> {
-  const { method = 'GET', body, headers = {}, signal } = options ?? {}
+  const { method = 'GET', body, headers = {}, signal, credentials = 'include', cache } = options ?? {}
 
   const canSendBody = method !== 'GET' && method !== 'HEAD'
   const requestHeaders: Record<string, string> = { ...headers }
@@ -56,11 +60,16 @@ export async function fetchApi<T = unknown, TBody = unknown>(
     requestHeaders['Content-Type'] = 'application/json'
   }
 
+  const effectiveCache: RequestCache | undefined =
+    cache ?? (method === 'GET' ? 'no-store' : undefined)
+
   try {
     const response = await fetch(url, {
       method,
       headers: requestHeaders,
       signal,
+      credentials,
+      ...(effectiveCache ? { cache: effectiveCache } : {}),
       ...(canSendBody && body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
 
