@@ -185,13 +185,14 @@ export const NAV: NavSection[] = [
   // ─── 8. Finance / Cash / Salary ─────────────────────────────────────────
   {
     id: 'finance',
-    href: '/middle-admin?tab=finance',
+    href: '/pos/finance',
     label: 'Финансы',
     icon: Wallet,
     desc: 'Касса, налоги, зарплата',
     color: 'lime',
     children: [
-      { id: 'finance-overview', href: '/middle-admin?tab=finance', label: 'Сводка', icon: Wallet, desc: 'Доходы и расходы' },
+      { id: 'finance-new', href: '/pos/finance', label: 'Финансы (новая)', icon: Wallet, desc: 'KPI, фильтры, экспорт', badge: 'new' },
+      { id: 'finance-overview', href: '/middle-admin?tab=finance', label: 'Сводка (старая)', icon: Wallet, desc: 'Доходы и расходы' },
       { id: 'cash-drawer', href: '/pos/shift', label: 'Кассовый ящик', icon: CreditCard, desc: 'Внесения и изъятия' },
       { id: 'salary', href: '/middle-admin?tab=finance&sub=salary', label: 'Зарплата', icon: Wallet, desc: 'Выплаты сотрудникам' },
       { id: 'tax-rates', href: '/pos/settings?focus=tax', label: 'Ставки налогов', icon: Percent, desc: 'НДС и сервисный сбор' },
