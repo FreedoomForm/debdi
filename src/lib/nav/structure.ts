@@ -171,7 +171,8 @@ export const NAV: NavSection[] = [
       { id: 'loyalty', href: '/pos/loyalty', label: 'Лояльность', icon: Award, desc: 'Баллы и уровни' },
       { id: 'chat', href: '/pos/chat', label: 'Чат', icon: MessageSquare, desc: 'Двухпанельный мессенджер', badge: 'new' },
       { id: 'chat-legacy', href: '/middle-admin?tab=chat', label: 'Чат (старый)', icon: MessageSquare, desc: 'Легаси-вид' },
-      { id: 'website', href: '/middle-admin?tab=interface&sub=site', label: 'Сайт-витрина', icon: Globe, desc: 'Поддомен и контент' },
+      { id: 'sites', href: '/pos/sites', label: 'Сайты-витрины', icon: Globe, desc: 'Поддомен, тема, контент (ru/uz/en)', badge: 'new' },
+      { id: 'website-legacy', href: '/middle-admin?tab=interface&sub=site', label: 'Сайт-витрина (старая)', icon: Globe, desc: 'Легаси-вид' },
     ],
   },
   // ─── 7. Delivery / Couriers / Routes ────────────────────────────────────
