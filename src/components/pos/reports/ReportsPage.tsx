@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
+import { RevenueTrendChart } from './RevenueTrendChart'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -315,6 +316,25 @@ export function ReportsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Trend chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Тренд выручки</CardTitle>
+            <CardDescription className="text-xs">
+              Выручка (слева) и количество заказов (справа) по дням
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading || !report ? (
+              <div className="grid place-items-center py-8">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <RevenueTrendChart series={report.series} />
+            )}
+          </CardContent>
+        </Card>
 
         {/* Daily table */}
         <Card>
