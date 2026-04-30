@@ -340,28 +340,28 @@ export default function FinancePage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI
+        <KpiTile
           label="Касса"
           value={formatCurrency(companyBalance, 'UZS')}
           icon={<Wallet className="h-4 w-4" />}
           tone={companyBalance >= 0 ? 'emerald' : 'rose'}
           hint="Текущий баланс компании"
         />
-        <KPI
+        <KpiTile
           label="Сегодня"
           value={formatCurrency(stats.todayNet, 'UZS')}
           icon={<TrendingUp className="h-4 w-4" />}
           tone={stats.todayNet >= 0 ? 'emerald' : 'rose'}
           hint={`+${formatCurrency(stats.todayIncome, 'UZS')} / −${formatCurrency(stats.todayExpense, 'UZS')}`}
         />
-        <KPI
+        <KpiTile
           label="Месяц"
           value={formatCurrency(stats.monthNet, 'UZS')}
           icon={<TrendingDown className="h-4 w-4" />}
           tone={stats.monthNet >= 0 ? 'emerald' : 'rose'}
           hint={`+${formatCurrency(stats.monthIncome, 'UZS')} / −${formatCurrency(stats.monthExpense, 'UZS')}`}
         />
-        <KPI
+        <KpiTile
           label="Долги клиентов"
           value={formatCurrency(stats.debtTotal, 'UZS')}
           icon={<Users className="h-4 w-4" />}
@@ -748,7 +748,6 @@ export default function FinancePage() {
   )
 }
 
-const KPI = KpiTile
 
 function Row({
   label,

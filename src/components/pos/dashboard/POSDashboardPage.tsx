@@ -49,6 +49,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
 import { LiveStrip } from './LiveStrip'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -412,6 +413,9 @@ export function POSDashboardPage() {
   )
 }
 
+// Local Kpi adapter — maps the page's 'primary' tone to KpiTile's 'amber'.
+// Keeps the call sites unchanged while the visual contract lives in
+// the shared @/components/pos/shared/KpiTile.
 function Kpi({
   icon,
   label,
@@ -426,26 +430,13 @@ function Kpi({
   small?: boolean
 }) {
   return (
-    <div
-      className={cn(
-        'rounded-xl border border-border bg-card p-3 shadow-sm',
-        tone === 'primary' && 'border-amber-200 bg-amber-50/60'
-      )}
-    >
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div
-        className={cn(
-          'mt-1 font-bold tabular-nums',
-          small ? 'text-sm' : 'text-2xl',
-          tone === 'primary' && 'text-amber-900'
-        )}
-      >
-        {value}
-      </div>
-    </div>
+    <KpiTile
+      icon={icon}
+      label={label}
+      value={value}
+      tone={tone === 'primary' ? 'amber' : 'neutral'}
+      className={small ? 'text-sm' : undefined}
+    />
   )
 }
 

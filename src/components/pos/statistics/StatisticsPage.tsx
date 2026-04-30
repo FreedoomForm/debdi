@@ -24,6 +24,8 @@ import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type Stats = {
   successfulOrders: number
@@ -112,30 +114,30 @@ export default function StatisticsPage() {
 
       {/* Headline KPIs */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI
+        <KpiTile
           label="Всего заказов"
-          value={String(totalOrders)}
+          value={totalOrders}
           icon={<BarChart3 className="h-4 w-4" />}
           tone="neutral"
           hint={`${stats?.successfulOrders ?? 0} доставлено`}
         />
-        <KPI
+        <KpiTile
           label="Доля успеха"
           value={`${successRate.toFixed(1)}%`}
           icon={<CheckCircle2 className="h-4 w-4" />}
           tone={successRate >= 80 ? 'emerald' : successRate >= 50 ? 'amber' : 'rose'}
           hint="доставлено / всего"
         />
-        <KPI
+        <KpiTile
           label="Картой"
           value={`${cardShare.toFixed(1)}%`}
           icon={<CreditCard className="h-4 w-4" />}
           tone="emerald"
           hint={`${stats?.cardOrders ?? 0} оплат картой`}
         />
-        <KPI
+        <KpiTile
           label="Спец. предпочтения"
-          value={String(stats?.specialPreferenceCustomers ?? 0)}
+          value={stats?.specialPreferenceCustomers ?? 0}
           icon={<Sparkles className="h-4 w-4" />}
           tone="neutral"
           hint="клиентов с настройками"
@@ -297,42 +299,8 @@ export default function StatisticsPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  icon,
-  hint,
-  tone,
-}: {
-  label: string
-  value: string
-  icon: React.ReactNode
-  hint: string
-  tone: 'emerald' | 'rose' | 'amber' | 'neutral'
-}) {
-  const toneClass = {
-    emerald: 'border-emerald-200 bg-emerald-50/60',
-    rose: 'border-rose-200 bg-rose-50/60',
-    amber: 'border-amber-200 bg-amber-50/60',
-    neutral: 'border-border bg-card',
-  }[tone]
-  const valueClass = {
-    emerald: 'text-emerald-900',
-    rose: 'text-rose-900',
-    amber: 'text-amber-900',
-    neutral: 'text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-xl border p-3 shadow-sm', toneClass)}>
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className={cn('mt-1 text-lg font-bold tabular-nums', valueClass)}>{value}</div>
-      <div className="text-[10px] text-muted-foreground">{hint}</div>
-    </div>
-  )
-}
+// Local KPI alias — single source of truth lives in @/components/pos/shared/KpiTile.
+const KPI = KpiTile
 
 function Stat({
   label,

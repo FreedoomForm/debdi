@@ -33,6 +33,7 @@ import {
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/pos'
 import { RevenueTrendChart } from './RevenueTrendChart'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -392,6 +393,7 @@ export function ReportsPage() {
   )
 }
 
+// Local Kpi adapter — maps the page's 'primary' tone to KpiTile's 'amber'.
 function Kpi({
   icon,
   label,
@@ -404,25 +406,12 @@ function Kpi({
   tone?: 'primary'
 }) {
   return (
-    <div
-      className={cn(
-        'rounded-xl border border-border bg-card p-3 shadow-sm',
-        tone === 'primary' && 'border-amber-200 bg-amber-50/60'
-      )}
-    >
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div
-        className={cn(
-          'mt-1 text-2xl font-bold tabular-nums',
-          tone === 'primary' && 'text-amber-900'
-        )}
-      >
-        {value}
-      </div>
-    </div>
+    <KpiTile
+      icon={icon}
+      label={label}
+      value={value}
+      tone={tone === 'primary' ? 'amber' : 'neutral'}
+    />
   )
 }
 

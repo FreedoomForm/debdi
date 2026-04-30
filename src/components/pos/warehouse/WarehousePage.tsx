@@ -268,28 +268,28 @@ export default function WarehousePage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI
+        <KpiTile
           label="Всего позиций"
           value={String(stats.total)}
           icon={<Boxes className="h-4 w-4" />}
           tone="neutral"
           hint="Уникальных SKU"
         />
-        <KPI
+        <KpiTile
           label="Мало"
           value={String(stats.lowStock)}
           icon={<AlertTriangle className="h-4 w-4" />}
           tone={stats.lowStock > 0 ? 'amber' : 'neutral'}
           hint="Ниже мин. остатка"
         />
-        <KPI
+        <KpiTile
           label="Закончилось"
           value={String(stats.outOfStock)}
           icon={<AlertTriangle className="h-4 w-4" />}
           tone={stats.outOfStock > 0 ? 'rose' : 'neutral'}
           hint="Нулевой остаток"
         />
-        <KPI
+        <KpiTile
           label="Стоимость склада"
           value={formatCurrency(stats.totalValue, 'UZS')}
           icon={<Boxes className="h-4 w-4" />}
@@ -591,5 +591,4 @@ export default function WarehousePage() {
   )
 }
 
-// Local KPI alias — single source of truth lives in @/components/pos/shared/KpiTile.
-const KPI = KpiTile
+// KPI tile is now provided by @/components/pos/shared/KpiTile (used directly above).

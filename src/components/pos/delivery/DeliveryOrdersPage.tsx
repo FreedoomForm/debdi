@@ -46,6 +46,7 @@ import {
 import { formatCurrency } from '@/lib/pos'
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
 
 type OrderStatus =
   | 'NEW'
@@ -232,25 +233,25 @@ export default function DeliveryOrdersPage() {
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI
+        <KpiTile
           label="Всего заказов"
-          value={String(stats.total)}
+          value={stats.total}
           tone="neutral"
           hint="за сегодня"
         />
-        <KPI
+        <KpiTile
           label="В работе"
-          value={String(stats.inProgress)}
+          value={stats.inProgress}
           tone={stats.inProgress > 0 ? 'amber' : 'neutral'}
           hint="новые / готовка / доставка"
         />
-        <KPI
+        <KpiTile
           label="Доставлено"
-          value={String(stats.delivered)}
+          value={stats.delivered}
           tone="emerald"
           hint="успешно завершено"
         />
-        <KPI
+        <KpiTile
           label="К оплате"
           value={formatCurrency(stats.pendingPayments, 'UZS')}
           tone={stats.pendingPayments > 0 ? 'rose' : 'neutral'}
@@ -431,34 +432,4 @@ export default function DeliveryOrdersPage() {
   )
 }
 
-function KPI({
-  label,
-  value,
-  hint,
-  tone,
-}: {
-  label: string
-  value: string
-  hint: string
-  tone: 'emerald' | 'rose' | 'amber' | 'neutral'
-}) {
-  const toneClass = {
-    emerald: 'border-emerald-200 bg-emerald-50/60',
-    rose: 'border-rose-200 bg-rose-50/60',
-    amber: 'border-amber-200 bg-amber-50/60',
-    neutral: 'border-border bg-card',
-  }[tone]
-  const valueClass = {
-    emerald: 'text-emerald-900',
-    rose: 'text-rose-900',
-    amber: 'text-amber-900',
-    neutral: 'text-foreground',
-  }[tone]
-  return (
-    <div className={cn('rounded-xl border p-3 shadow-sm', toneClass)}>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={cn('mt-1 text-lg font-bold tabular-nums', valueClass)}>{value}</div>
-      <div className="text-[10px] text-muted-foreground">{hint}</div>
-    </div>
-  )
-}
+// KPI tile is now provided by @/components/pos/shared/KpiTile
