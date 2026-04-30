@@ -9,7 +9,7 @@
  * separate POS dashboard quick-grid. Used by the unified `/pos/*` and
  * eventually `/middle-admin` shells.
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Menu, X, ChevronRight, Search, LogOut, ShoppingBag } from 'lucide-react'
@@ -83,6 +83,11 @@ export function UnifiedSidebar({
   const searchStr = search?.toString() ? `?${search.toString()}` : ''
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hoverSection, setHoverSection] = useState<string | null>(null)
+  // Section the user explicitly opened by clicking the level-1 icon.
+  // This lets users browse the children of any section without triggering
+  // a route change — fixes the issue where clicking 'Kitchen' / 'Sales' /
+  // 'Floor' previously jumped straight to /pos/kds, /pos/terminal, /pos/tables.
+  const [pinnedSectionId, setPinnedSectionId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
 
   const { section: activeSection, child: activeChild } = useMemo(
@@ -90,8 +95,15 @@ export function UnifiedSidebar({
     [pathname, searchStr]
   )
 
-  // The "expanded" section is whichever the user is hovering, or the active one.
-  const expandedId = hoverSection ?? activeSection?.id ?? NAV[0].id
+  // Reset pinned override whenever the user actually navigates somewhere new
+  // — so pin doesn't outlive the route change.
+  useEffect(() => {
+    setPinnedSectionId(null)
+  }, [pathname, searchStr])
+
+  // Priority: pinned > hovered > active route > first section.
+  const expandedId =
+    pinnedSectionId ?? hoverSection ?? activeSection?.id ?? NAV[0].id
   const expanded = NAV.find((s) => s.id === expandedId) ?? NAV[0]
 
   // Filter children if user is searching.
@@ -150,35 +162,45 @@ export function UnifiedSidebar({
           </Link>
           {NAV.map((s) => {
             const isActive = activeSection?.id === s.id
+            const isExpanded = expanded.id === s.id
             const isHover = hoverSection === s.id
             const Icon = s.icon
             const colors = COLOR_MAP[s.color] ?? COLOR_MAP.slate
             return (
-              <Link
+              <button
                 key={s.id}
-                href={s.href}
+                type="button"
                 onMouseEnter={() => setHoverSection(s.id)}
                 onMouseLeave={() => setHoverSection(null)}
-                onClick={() => setMobileOpen(false)}
+                onClick={() => {
+                  // Click on the level-1 icon only PINS the section so its
+                  // children show in the level-2 rail. We never navigate
+                  // straight to s.href — navigation belongs to the level-2
+                  // child links (matches how the active section behaves on
+                  // pages like /pos/dashboard).
+                  setPinnedSectionId(s.id)
+                }}
                 className={cn(
                   'group relative grid h-12 w-12 place-items-center rounded-xl transition',
                   isActive
                     ? colors.active
-                    : isHover
+                    : isExpanded || isHover
                       ? 'bg-accent text-foreground'
                       : 'text-muted-foreground hover:bg-accent'
                 )}
                 title={s.label}
+                aria-current={isActive ? 'page' : undefined}
+                aria-expanded={isExpanded}
               >
                 {isActive && (
                   <span className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-current" />
                 )}
                 <Icon className="h-5 w-5" />
                 {/* Tooltip-like label on hover */}
-                <span className="absolute left-full ml-2 hidden whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-xs font-medium shadow-md group-hover:block">
+                <span className="pointer-events-none absolute left-full ml-2 hidden whitespace-nowrap rounded-md border border-border bg-popover px-2 py-1 text-xs font-medium shadow-md group-hover:block">
                   {s.label}
                 </span>
-              </Link>
+              </button>
             )
           })}
           <div className="mt-auto" />
