@@ -179,7 +179,8 @@ export const NAV: NavSection[] = [
     desc: 'Курьеры, маршруты, карта',
     color: 'indigo',
     children: [
-      { id: 'orders-delivery', href: '/middle-admin?tab=orders', label: 'Заказы доставки', icon: Receipt, desc: 'Активные доставки' },
+      { id: 'orders-delivery', href: '/pos/delivery', label: 'Заказы доставки', icon: Receipt, desc: 'KPI, статус-пиплайн, лайв-обновление', badge: 'new' },
+      { id: 'orders-delivery-legacy', href: '/middle-admin?tab=orders', label: 'Заказы (старая)', icon: Receipt, desc: 'Легаси-вид' },
       { id: 'couriers', href: '/pos/couriers', label: 'Курьеры', icon: Truck, desc: 'KPI, лайв-позиции, зарплата', badge: 'new' },
       { id: 'couriers-legacy', href: '/middle-admin?tab=admins&role=COURIER', label: 'Курьеры (старая)', icon: Truck, desc: 'Легаси-вид' },
       { id: 'live-map', href: '/middle-admin?tab=orders&sub=map', label: 'Live-карта', icon: MapPin, desc: 'Курьеры в реальном времени', badge: 'live' },
