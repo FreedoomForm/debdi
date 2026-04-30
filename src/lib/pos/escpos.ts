@@ -311,55 +311,10 @@ export function buildKitchenTicket(
   return b.toBuffer()
 }
 
-/** Send raw ESC/POS bytes to a network printer at <ip>:<port>. */
-export async function sendToNetworkPrinter(
-  ip: string,
-  port: number,
-  data: Uint8Array
-): Promise<{ ok: boolean; error?: string }> {
-  // Server-side only — uses Node net socket. Wrapped in dynamic import so the
-  // module stays compatible with browser bundlers.
-  if (typeof window !== 'undefined') {
-    return { ok: false, error: 'Network printing must run server-side' }
-  }
-  try {
-    const net = await import('node:net')
-    return await new Promise((resolve) => {
-      const sock = new net.Socket()
-      let settled = false
-      const cleanup = (result: { ok: boolean; error?: string }) => {
-        if (settled) return
-        settled = true
-        try {
-          sock.destroy()
-        } catch {
-          /* ignore */
-        }
-        resolve(result)
-      }
-      sock.setTimeout(5000)
-      sock.on('error', (err) => cleanup({ ok: false, error: err.message }))
-      sock.on('timeout', () =>
-        cleanup({ ok: false, error: 'Printer connection timeout' })
-      )
-      sock.connect(port, ip, () => {
-        sock.write(Buffer.from(data), (err) => {
-          if (err) {
-            cleanup({ ok: false, error: err.message })
-          } else {
-            sock.end()
-            cleanup({ ok: true })
-          }
-        })
-      })
-    })
-  } catch (err) {
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : String(err),
-    }
-  }
-}
+// Network printing transport lives in `./escpos-server.ts` (server-only;
+// imports `node:net`). API routes import it directly to avoid leaking
+// `node:net` into client bundles.
+
 
 /** Render a receipt as printable HTML — used for browser preview, PDF export
  *  and for sending via "Print to default printer" (window.print). */

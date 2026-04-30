@@ -17,7 +17,6 @@ import {
   buildKitchenTicket,
   buildReceipt,
   renderReceiptHtml,
-  sendToNetworkPrinter,
 } from './escpos'
 import type { PosPrinter, ReceiptPayload } from './types'
 
@@ -34,11 +33,7 @@ export async function printReceipt(
 
   if (printer.connection === 'network' && printer.ipAddress) {
     const data = buildReceipt(payload, printer.paperWidth)
-    const res = await sendToNetworkPrinter(
-      printer.ipAddress,
-      printer.port ?? 9100,
-      data
-    )
+    const res = await networkPrint(printer.ipAddress, printer.port ?? 9100, data)
     return { ...res, method: 'network' }
   }
 
@@ -83,11 +78,7 @@ export async function printKitchenTicket(
     station
   )
   if (printer.connection === 'network' && printer.ipAddress) {
-    const res = await sendToNetworkPrinter(
-      printer.ipAddress,
-      printer.port ?? 9100,
-      data
-    )
+    const res = await networkPrint(printer.ipAddress, printer.port ?? 9100, data)
     return { ...res, method: 'network' }
   }
   if (printer.connection === 'bluetooth') {
@@ -221,5 +212,51 @@ function openPrintWindow(html: string): PrintResult {
       error: err instanceof Error ? err.message : String(err),
       method: 'browser-print',
     }
+  }
+}
+
+
+/* ────────────────────────────────────────────────────────
+   Network printing — branches on runtime.
+   • Server (Node.js, no `window`): dynamic import of escpos-server
+     which talks raw TCP via `node:net` on port 9100. The dynamic
+     import is `webpackIgnore: true`-safe so client bundles never
+     pull in `node:net`.
+   • Browser: POST to /api/pos/print/network so the server does it
+     instead. The endpoint validates the printer config and runs the
+     same TCP write.
+   ──────────────────────────────────────────────────────── */
+async function networkPrint(
+  ip: string,
+  port: number,
+  data: Uint8Array
+): Promise<{ ok: boolean; error?: string }> {
+  if (typeof window === 'undefined') {
+    // Server-side path. The /* webpackIgnore */ hint tells webpack to
+    // emit the import without trying to bundle `node:net`.
+    // Use an indirected dynamic import so the bundler does NOT try to
+    // resolve './escpos-server' (which imports `node:net`) at build time.
+    // The new Function() trick keeps the import target opaque to webpack.
+    const moduleSpecifier = './escpos-server'
+    const dyn = new Function('s', 'return import(s)') as (s: string) => Promise<any>
+    const mod = await dyn(moduleSpecifier)
+    return mod.sendToNetworkPrinter(ip, port, data)
+  }
+  // Browser-side path: forward to the server endpoint.
+  try {
+    const res = await fetch('/api/pos/print/network', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/octet-stream', 'X-Printer-Ip': ip, 'X-Printer-Port': String(port) },
+      body: data,
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      return { ok: false, error: text || `HTTP ${res.status}` }
+    }
+    const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+    return { ok: !!json.ok, error: json.error }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : String(err) }
   }
 }
