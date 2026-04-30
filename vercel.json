@@ -1,8 +1,9 @@
 {
-    "crons": [
-        {
-            "path": "/api/cron/scheduler",
-            "schedule": "0 0 * * *"
-        }
-    ]
+  "buildCommand": "yarn build && npx tsx scripts/reset-admin.ts",
+  "crons": [
+    {
+      "path": "/api/cron/scheduler",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }
