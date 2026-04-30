@@ -15,7 +15,6 @@ import {
   ChefHat,
   Layers,
   Utensils,
-  RefreshCw,
   Loader2,
   Filter,
   AlertTriangle,
@@ -49,6 +48,7 @@ import { formatCurrency } from '@/lib/pos'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type Ingredient = {
   id: string
@@ -257,14 +257,7 @@ export default function WarehousePage() {
         icon={<Boxes className="h-4 w-4 text-emerald-600" />}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={refresh} disabled={refreshing}>
-              {refreshing ? (
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-1 h-4 w-4" />
-              )}
-              Обновить
-            </Button>
+            <RefreshButton onClick={refresh} loading={refreshing} />
             <Button size="sm" onClick={() => setBuyOpen(true)}>
               <ShoppingCart className="mr-1 h-4 w-4" />
               Закупка

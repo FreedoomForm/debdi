@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   Search,
   Loader2,
-  RefreshCw,
   UserPlus,
   Filter,
   Download,
@@ -51,6 +50,7 @@ import {
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type Role = 'SUPER_ADMIN' | 'MIDDLE_ADMIN' | 'LOW_ADMIN' | 'COURIER' | 'WORKER'
 
@@ -224,14 +224,7 @@ export default function AdminsPage() {
         icon={<ShieldCheck className="h-4 w-4 text-violet-600" />}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-1 h-4 w-4" />
-              )}
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
             <Button variant="outline" size="sm" onClick={exportCsv}>
               <Download className="mr-1 h-4 w-4" />
               CSV

@@ -7,7 +7,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   BarChart3,
-  RefreshCw,
   Loader2,
   CheckCircle2,
   XCircle,
@@ -26,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type Stats = {
   successfulOrders: number
@@ -97,14 +97,7 @@ export default function StatisticsPage() {
         backHref="/pos/dashboard"
         icon={<BarChart3 className="h-4 w-4 text-amber-600" />}
         actions={
-          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            {loading ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-1 h-4 w-4" />
-            )}
-            Обновить
-          </Button>
+          <RefreshButton onClick={load} loading={loading} />
         }
       />
 

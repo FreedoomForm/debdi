@@ -10,7 +10,6 @@ import {
   Receipt,
   Search,
   Loader2,
-  RefreshCw,
   Filter,
   Download,
   Phone,
@@ -47,6 +46,7 @@ import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type OrderStatus =
   | 'NEW'
@@ -204,14 +204,7 @@ export default function DeliveryOrdersPage() {
         icon={<Truck className="h-4 w-4 text-indigo-600" />}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-1 h-4 w-4" />
-              )}
-              Обновить
-            </Button>
+            <RefreshButton onClick={refresh} loading={loading} />
             <Button variant="outline" size="sm" onClick={exportCsv}>
               <Download className="mr-1 h-4 w-4" />
               CSV

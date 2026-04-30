@@ -12,7 +12,6 @@ import {
   Phone,
   Search,
   Loader2,
-  RefreshCw,
   UserPlus,
   Wallet,
   TrendingUp,
@@ -52,6 +51,7 @@ import { formatCurrency } from '@/lib/pos'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type Client = {
   id: string
@@ -206,14 +206,7 @@ export default function ClientsPage() {
         icon={<Users className="h-4 w-4 text-cyan-600" />}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-1 h-4 w-4" />
-              )}
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
             <Button variant="outline" size="sm" onClick={exportCsv}>
               <Download className="mr-1 h-4 w-4" />
               CSV

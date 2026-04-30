@@ -22,7 +22,6 @@ import {
   ReceiptText,
   Filter,
   Download,
-  RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -57,6 +56,7 @@ import { formatCurrency } from '@/lib/pos'
 import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { Row } from '@/components/pos/shared/FormPrimitives'
 
 type Transaction = {
@@ -297,14 +297,7 @@ export default function FinancePage() {
         icon={<Wallet className="h-4 w-4 text-emerald-600" />}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={refresh} disabled={refreshing}>
-              {refreshing ? (
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-1 h-4 w-4" />
-              )}
-              Обновить
-            </Button>
+            <RefreshButton onClick={refresh} loading={refreshing} />
             <Button variant="outline" size="sm" onClick={exportCsv}>
               <Download className="mr-1 h-4 w-4" />
               CSV
