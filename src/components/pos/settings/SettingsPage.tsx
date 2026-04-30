@@ -31,6 +31,7 @@ import {
 import { useAdminSettings } from '@/hooks/useAdminSettings'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { Field, Toggle, LinkRow } from '@/components/pos/shared/FormPrimitives'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -401,68 +402,4 @@ export function SettingsPage() {
   )
 }
 
-function Field({
-  label,
-  children,
-  full,
-}: {
-  label: string
-  children: React.ReactNode
-  full?: boolean
-}) {
-  return (
-    <div className={full ? 'sm:col-span-2' : ''}>
-      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </Label>
-      <div className="mt-1">{children}</div>
-    </div>
-  )
-}
-
-function Toggle({
-  label,
-  hint,
-  checked,
-  onChange,
-}: {
-  label: string
-  hint?: string
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
-  return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-md border border-border bg-secondary/30 px-3 py-2 sm:col-span-2">
-      <div>
-        <div className="text-sm font-medium">{label}</div>
-        {hint && (
-          <div className="text-[11px] text-muted-foreground">{hint}</div>
-        )}
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
-    </label>
-  )
-}
-
-function LinkRow({
-  href,
-  label,
-  desc,
-}: {
-  href: string
-  label: string
-  desc: string
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm transition hover:bg-accent"
-    >
-      <div>
-        <div className="font-medium">{label}</div>
-        <div className="text-[11px] text-muted-foreground">{desc}</div>
-      </div>
-      <span className="text-muted-foreground">→</span>
-    </Link>
-  )
-}
+// Field / Toggle / LinkRow now live in @/components/pos/shared/FormPrimitives
