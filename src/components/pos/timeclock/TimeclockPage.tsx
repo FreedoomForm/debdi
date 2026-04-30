@@ -15,7 +15,6 @@ import {
   Coffee,
   Loader2,
   PlayCircle,
-  RefreshCw,
   StopCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -31,6 +30,7 @@ import {
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { formatDateTime } from '@/lib/pos'
 
 type Entry = {
@@ -151,9 +151,7 @@ export function TimeclockPage() {
           ) : undefined
         }
         actions={
-          <Button size="icon" variant="ghost" onClick={load}>
-            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-          </Button>
+          <RefreshButton onClick={load} loading={loading} variant="ghost" size="icon" label={null} />
         }
       />
 

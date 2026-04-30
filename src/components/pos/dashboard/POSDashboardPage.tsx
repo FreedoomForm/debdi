@@ -28,7 +28,6 @@ import {
   Percent,
   Printer,
   Receipt as ReceiptIcon,
-  RefreshCw,
   ShoppingCart,
   Store,
   Timer,
@@ -51,6 +50,7 @@ import { formatCurrency } from '@/lib/pos'
 import { LiveStrip } from './LiveStrip'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type SalesReport = {
   range: { from: string; to: string }
@@ -272,9 +272,7 @@ export function POSDashboardPage() {
         backHref="/pos/dashboard"
         badge="Сегодня"
         actions={
-          <Button size="icon" variant="ghost" onClick={() => load()}>
-            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-          </Button>
+          <RefreshButton onClick={() => load()} loading={loading} variant="ghost" size="icon" label={null} />
         }
       />
 

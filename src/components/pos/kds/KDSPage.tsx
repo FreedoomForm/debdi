@@ -17,7 +17,6 @@ import {
   Clock,
   Loader2,
   Play,
-  RefreshCw,
   Bell,
   CheckCircle2,
   Volume2,
@@ -27,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { formatTime, relativeTime } from '@/lib/pos'
 
 type KdsItem = {
@@ -189,15 +189,14 @@ export function KDSPage() {
                 <VolumeX className="h-4 w-4" />
               )}
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
+            <RefreshButton
               onClick={() => load()}
+              loading={loading}
+              variant="ghost"
+              size="icon"
+              label={null}
               className="text-slate-300 hover:text-white"
-            >
-              <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-            </Button>
+            />
           </>
         }
       />

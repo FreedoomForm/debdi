@@ -11,7 +11,6 @@ import {
   MessageSquare,
   Send,
   Search,
-  RefreshCw,
   Loader2,
   Plus,
   Users,
@@ -32,6 +31,7 @@ import {
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 
 type Participant = {
   id: string
@@ -210,10 +210,7 @@ export default function ChatPage() {
         icon={<MessageSquare className="h-4 w-4 text-cyan-600" />}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => refreshConversations()}>
-              <RefreshCw className="mr-1 h-4 w-4" />
-              Обновить
-            </Button>
+            <RefreshButton onClick={() => refreshConversations()} />
             <Button
               size="sm"
               onClick={() => {

@@ -9,13 +9,14 @@
 import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, RefreshCw, Truck, Users } from 'lucide-react'
+import { ArrowLeft, MapPin, Truck, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { usePolling } from '@/hooks/usePolling'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import type { CourierPin } from './CourierMap'
 
 // Leaflet must run client-side only — `window` access at module eval.
@@ -80,10 +81,7 @@ export default function DeliveryMapPage() {
         actions={
           <>
             <span className="text-[11px] text-muted-foreground">Обновление каждые 15 сек</span>
-            <Button size="sm" variant="outline" onClick={refresh} disabled={loading}>
-              <RefreshCw className={cn('mr-1 h-3.5 w-3.5', loading && 'animate-spin')} />
-              Обновить
-            </Button>
+            <RefreshButton onClick={refresh} loading={loading} />
           </>
         }
       />

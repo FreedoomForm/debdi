@@ -14,7 +14,6 @@ import {
   Edit3,
   Loader2,
   Plus,
-  RefreshCw,
   Save,
   X,
   Users,
@@ -32,6 +31,7 @@ import {
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import type { PosTable, TableStatusValue } from '@/lib/pos'
 
 const STATUS_META: Record<
@@ -238,9 +238,7 @@ export function TablesPage() {
             <Button size="sm" onClick={() => setCreateOpen(true)}>
               <Plus className="mr-1.5 h-3.5 w-3.5" /> Стол
             </Button>
-            <Button size="icon" variant="ghost" onClick={() => load()}>
-              <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-            </Button>
+            <RefreshButton onClick={() => load()} loading={loading} variant="ghost" size="icon" label={null} />
           </>
         }
       />

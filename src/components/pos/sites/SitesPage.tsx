@@ -19,7 +19,6 @@ import {
   Globe,
   Loader2,
   Palette,
-  RefreshCw,
   Save,
   Sparkles,
 } from 'lucide-react'
@@ -36,6 +35,7 @@ import {
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { RefreshButton } from '@/components/pos/shared/RefreshButton'
 import { Field } from '@/components/pos/shared/FormPrimitives'
 
 type StylePreset = {
@@ -166,12 +166,7 @@ export default function SitesPage() {
         badge={data?.website.subdomain || undefined}
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-              <RefreshCw
-                className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
-              />
-              Обновить
-            </Button>
+            <RefreshButton onClick={load} loading={loading} />
             <Button size="sm" onClick={save} disabled={saving}>
               {saving ? (
                 <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
