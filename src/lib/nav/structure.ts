@@ -216,7 +216,8 @@ export const NAV: NavSection[] = [
     color: 'violet',
     children: [
       { id: 'employees', href: '/pos/employees', label: 'Сотрудники', icon: UserCog, desc: 'Роль, зарплата' },
-      { id: 'admins', href: '/middle-admin?tab=admins', label: 'Управление', icon: ShieldCheck, desc: 'Создание / блокировка' },
+      { id: 'admins', href: '/pos/admins', label: 'Персонал', icon: ShieldCheck, desc: 'KPI, фильтры, создание', badge: 'new' },
+      { id: 'admins-legacy', href: '/middle-admin?tab=admins', label: 'Управление (старая)', icon: ShieldCheck, desc: 'Легаси-вид' },
       { id: 'timeclock', href: '/pos/timeclock', label: 'Тайм-трекер', icon: Timer, desc: 'Учёт смен' },
       { id: 'roles', href: '/pos/employees?focus=roles', label: 'Роли и доступ', icon: ShieldCheck, desc: 'Допуски к вкладкам' },
     ],
