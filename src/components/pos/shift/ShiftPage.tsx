@@ -63,8 +63,10 @@ export function ShiftPage() {
 
   useEffect(() => {
     load()
-    const t = setInterval(load, 30000)
-    return () => clearInterval(t)
+    const t = window.setInterval(() => {
+      if (document.visibilityState === 'visible') load()
+    }, 30000)
+    return () => window.clearInterval(t)
   }, [load])
 
   const handleOpen = async () => {

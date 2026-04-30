@@ -258,8 +258,10 @@ export function POSDashboardPage() {
 
   useEffect(() => {
     load()
-    const t = setInterval(load, 60000)
-    return () => clearInterval(t)
+    const t = window.setInterval(() => {
+      if (document.visibilityState === 'visible') load()
+    }, 60000)
+    return () => window.clearInterval(t)
   }, [load])
 
   return (

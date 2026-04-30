@@ -116,8 +116,10 @@ export function KDSPage() {
 
   useEffect(() => {
     load()
-    const t = setInterval(load, REFRESH_MS)
-    return () => clearInterval(t)
+    const t = window.setInterval(() => {
+      if (document.visibilityState === 'visible') load()
+    }, REFRESH_MS)
+    return () => window.clearInterval(t)
   }, [load, station])
 
   // Tick every second for ageing colors.
