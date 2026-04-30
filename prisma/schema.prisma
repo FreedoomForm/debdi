@@ -1034,3 +1034,54 @@ enum PrinterType {
   LABEL
   REPORT
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POS EXTENSIONS — Gift cards, employee timeclock
+// ═══════════════════════════════════════════════════════════════════════════
+
+model GiftCard {
+  id            String               @id @default(cuid())
+  ownerAdminId  String
+  code          String               @unique
+  initialValue  Float
+  balance       Float
+  currency      String               @default("UZS")
+  issuedToName  String?
+  issuedToPhone String?
+  issuedAt      DateTime             @default(now())
+  expiresAt     DateTime?
+  isActive      Boolean              @default(true)
+  redemptions   GiftCardRedemption[]
+  notes         String?
+
+  @@index([ownerAdminId])
+  @@map("gift_cards")
+}
+
+model GiftCardRedemption {
+  id          String   @id @default(cuid())
+  giftCardId  String
+  giftCard    GiftCard @relation(fields: [giftCardId], references: [id], onDelete: Cascade)
+  orderId     String?
+  amount      Float
+  performedBy String?
+  createdAt   DateTime @default(now())
+
+  @@index([giftCardId, createdAt])
+  @@map("gift_card_redemptions")
+}
+
+model TimeclockEntry {
+  id           String    @id @default(cuid())
+  employeeId   String // Admin id
+  ownerAdminId String
+  clockedInAt  DateTime
+  clockedOutAt DateTime?
+  breakMinutes Int       @default(0)
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  @@index([employeeId, clockedInAt])
+  @@index([ownerAdminId])
+  @@map("timeclock_entries")
+}

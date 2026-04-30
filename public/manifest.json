@@ -1,25 +1,64 @@
 {
-    "name": "AutoFood - Delivery Management System",
-    "short_name": "AutoFood",
+    "name": "Debdi POS — Operations & Point of Sale",
+    "short_name": "Debdi POS",
     "id": "/",
-    "description": "O'zbekistonda restoran va kafelar uchun eng zamonaviy yetkazib berishni avtomatlashtirish tizimi. Kuryerlar nazorati, CRM va hisobotlar.",
-    "start_url": "/?source=pwa",
+    "description": "Полнофункциональная POS SaaS платформа для ресторанов и розницы: терминал, кухонный дисплей, столы, лояльность, склад и аналитика.",
+    "start_url": "/pos/dashboard?source=pwa",
     "display": "standalone",
     "display_override": [
         "standalone",
         "minimal-ui",
         "browser"
     ],
-    "orientation": "portrait-primary",
-    "background_color": "#0b0b0b",
-    "theme_color": "#171717",
+    "orientation": "any",
+    "background_color": "#f4f5f8",
+    "theme_color": "#1c2c4a",
     "scope": "/",
-    "lang": "uz",
+    "lang": "ru",
     "dir": "ltr",
     "categories": [
         "business",
+        "finance",
         "food",
         "productivity"
+    ],
+    "shortcuts": [
+        {
+            "name": "Терминал",
+            "short_name": "POS",
+            "description": "Открыть кассовый терминал",
+            "url": "/pos/terminal?source=pwa",
+            "icons": [
+                { "src": "/icon-192.png", "sizes": "192x192" }
+            ]
+        },
+        {
+            "name": "KDS · Кухня",
+            "short_name": "KDS",
+            "description": "Открыть кухонный дисплей",
+            "url": "/pos/kds?source=pwa",
+            "icons": [
+                { "src": "/icon-192.png", "sizes": "192x192" }
+            ]
+        },
+        {
+            "name": "Столы",
+            "short_name": "Столы",
+            "description": "Floor plan и резервы",
+            "url": "/pos/tables?source=pwa",
+            "icons": [
+                { "src": "/icon-192.png", "sizes": "192x192" }
+            ]
+        },
+        {
+            "name": "Дашборд",
+            "short_name": "Дашборд",
+            "description": "Аналитика и быстрый доступ",
+            "url": "/pos/dashboard?source=pwa",
+            "icons": [
+                { "src": "/icon-192.png", "sizes": "192x192" }
+            ]
+        }
     ],
     "icons": [
         {
@@ -69,63 +108,13 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "/og-image.png",
-            "sizes": "1200x630",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "AutoFood Dashboard"
         },
         {
-            "src": "/og-image.png",
-            "sizes": "1200x630",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "AutoFood Mobile Dashboard"
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
         }
     ],
-    "shortcuts": [
-        {
-            "name": "Orders",
-            "short_name": "Orders",
-            "description": "View all orders",
-            "url": "/middle-admin?tab=orders",
-            "icons": [
-                {
-                    "src": "/icon-96.png",
-                    "sizes": "96x96"
-                }
-            ]
-        },
-        {
-            "name": "Clients",
-            "short_name": "Clients",
-            "description": "Manage clients",
-            "url": "/middle-admin?tab=clients",
-            "icons": [
-                {
-                    "src": "/icon-96.png",
-                    "sizes": "96x96"
-                }
-            ]
-        },
-        {
-            "name": "Statistics",
-            "short_name": "Stats",
-            "description": "View statistics",
-            "url": "/middle-admin?tab=statistics",
-            "icons": [
-                {
-                    "src": "/icon-96.png",
-                    "sizes": "96x96"
-                }
-            ]
-        }
-    ],
-    "related_applications": [],
-    "prefer_related_applications": false,
-    "handle_links": "auto"
+    "screenshots": []
 }
