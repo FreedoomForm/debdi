@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import { useAdminSettings } from '@/hooks/useAdminSettings'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -135,25 +136,20 @@ export function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+      <PosPageHeader
+        title="Настройки"
+        icon={<Cog className="h-4 w-4 text-amber-500" />}
+        actions={
+          <Button size="sm" onClick={save} disabled={saving}>
+            {saving ? (
+              <Check className="mr-1.5 h-3.5 w-3.5 animate-pulse" />
+            ) : (
+              <Save className="mr-1.5 h-3.5 w-3.5" />
+            )}
+            Сохранить
           </Button>
-          <Cog className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Настройки</h1>
-        </div>
-        <Button size="sm" onClick={save} disabled={saving}>
-          {saving ? (
-            <Check className="mr-1.5 h-3.5 w-3.5 animate-pulse" />
-          ) : (
-            <Save className="mr-1.5 h-3.5 w-3.5" />
-          )}
-          Сохранить
-        </Button>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-3xl space-y-5 px-4 py-6">
         <Card>

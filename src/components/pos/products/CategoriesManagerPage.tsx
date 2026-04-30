@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import type { PosCategory } from '@/lib/pos'
 
 const EMPTY: Partial<PosCategory> & { isActive?: boolean } = {
@@ -169,28 +170,22 @@ export function CategoriesManagerPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/products" aria-label="К товарам">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <h1 className="text-sm font-semibold">Категории товаров</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={load}>
-            <RefreshCw
-              className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')}
-            />
-            Обновить
-          </Button>
-          <Button size="sm" onClick={() => setEditing({ ...EMPTY })}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Категория
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Категории товаров"
+        backHref="/pos/products"
+        actions={
+          <>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', loading && 'animate-spin')} />
+              Обновить
+            </Button>
+            <Button size="sm" onClick={() => setEditing({ ...EMPTY })}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Категория
+            </Button>
+          </>
+        }
+      />
 
       <main className="mx-auto max-w-2xl px-4 py-6">
         {loading ? (

@@ -30,6 +30,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { formatDateTime } from '@/lib/pos'
 
 type Entry = {
@@ -139,25 +140,22 @@ export function TimeclockPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/dashboard" aria-label="Назад">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Clock className="h-4 w-4 text-amber-500" />
-          <h1 className="text-sm font-semibold">Учёт рабочего времени</h1>
-          {open && (
+      <PosPageHeader
+        title="Учёт рабочего времени"
+        icon={<Clock className="h-4 w-4 text-amber-500" />}
+        badge={
+          open ? (
             <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
               ● На смене
             </Badge>
-          )}
-        </div>
-        <Button size="icon" variant="ghost" onClick={load}>
-          <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-        </Button>
-      </header>
+          ) : undefined
+        }
+        actions={
+          <Button size="icon" variant="ghost" onClick={load}>
+            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+          </Button>
+        }
+      />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
         {loading ? (

@@ -31,6 +31,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import type { PosTable, TableStatusValue } from '@/lib/pos'
 
 const STATUS_META: Record<
@@ -213,40 +214,36 @@ export function TablesPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-border bg-card px-3">
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-            <Link href="/pos/terminal" aria-label="К терминалу">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <h1 className="text-sm font-semibold">Залы и столы</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant={editMode ? 'default' : 'outline'}
-            onClick={() => setEditMode((v) => !v)}
-          >
-            {editMode ? (
-              <>
-                <Save className="mr-1.5 h-3.5 w-3.5" /> Готово
-              </>
-            ) : (
-              <>
-                <Edit3 className="mr-1.5 h-3.5 w-3.5" /> Редактировать
-              </>
-            )}
-          </Button>
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Стол
-          </Button>
-          <Button size="icon" variant="ghost" onClick={() => load()}>
-            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Залы и столы"
+        backHref="/pos/terminal"
+        actions={
+          <>
+            <Button
+              type="button"
+              size="sm"
+              variant={editMode ? 'default' : 'outline'}
+              onClick={() => setEditMode((v) => !v)}
+            >
+              {editMode ? (
+                <>
+                  <Save className="mr-1.5 h-3.5 w-3.5" /> Готово
+                </>
+              ) : (
+                <>
+                  <Edit3 className="mr-1.5 h-3.5 w-3.5" /> Редактировать
+                </>
+              )}
+            </Button>
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> Стол
+            </Button>
+            <Button size="icon" variant="ghost" onClick={() => load()}>
+              <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+            </Button>
+          </>
+        }
+      />
 
       {/* Section chips */}
       <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border bg-card px-3 py-2">
