@@ -36,7 +36,6 @@ import {
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { RefreshButton } from '@/components/pos/shared/RefreshButton'
-import { Field } from '@/components/pos/shared/FormPrimitives'
 
 type StylePreset = {
   id: string
