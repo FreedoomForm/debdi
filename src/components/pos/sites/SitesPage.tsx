@@ -25,7 +25,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Field } from '@/components/pos/shared/FormPrimitives'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
+import { Field } from '@/components/pos/shared/FormPrimitives'
 
 type StylePreset = {
   id: string
@@ -203,20 +204,14 @@ export default function SitesPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                      Название сайта
-                    </Label>
+                  <Field label="Название сайта">
                     <Input
                       value={siteName}
                       onChange={(e) => setSiteName(e.target.value)}
                       placeholder="My Restaurant"
                     />
-                  </div>
-                  <div>
-                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                      Поддомен
-                    </Label>
+                  </Field>
+                  <Field label="Поддомен">
                     <div className="flex">
                       <Input
                         value={subdomain}
@@ -238,7 +233,7 @@ export default function SitesPage() {
                     <p className="mt-1 text-[10px] text-muted-foreground">
                       3–32 символа, латиница, цифры, дефис.
                     </p>
-                  </div>
+                  </Field>
                 </div>
 
                 {/* URL preview */}
