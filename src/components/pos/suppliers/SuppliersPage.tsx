@@ -19,6 +19,9 @@ import {
   Plus,
   Search,
   X,
+  Pencil,
+  Power,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -69,6 +72,7 @@ export function SuppliersPage() {
   const [query, setQuery] = useState('')
   const [editing, setEditing] = useState<Partial<Supplier> | null>(null)
   const [busy, setBusy] = useState(false)
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -100,24 +104,71 @@ export function SuppliersPage() {
     )
   }, [items, query])
 
+  const toggleActive = async (s: Supplier) => {
+    setRowBusyId(s.id)
+    try {
+      const res = await fetch(`/api/pos/suppliers/${s.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: !s.isActive }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success(s.isActive ? 'Поставщик отключён' : 'Поставщик активирован')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось обновить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const deleteSupplier = async (s: Supplier) => {
+    const ok =
+      typeof window === 'undefined' ? true : window.confirm(`Удалить «${s.name}»?`)
+    if (!ok) return
+    setRowBusyId(s.id)
+    try {
+      const res = await fetch(`/api/pos/suppliers/${s.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Поставщик удалён')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
   const save = async () => {
     if (!editing?.name?.trim()) return
     setBusy(true)
     try {
-      const res = await fetch('/api/pos/suppliers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: editing.name,
-          contactName: editing.contactName || null,
-          phone: editing.phone || null,
-          email: editing.email || null,
-          address: editing.address || null,
-          notes: editing.notes || null,
-          isActive: editing.isActive ?? true,
-        }),
-      })
+      const isUpdate = Boolean(editing.id)
+      const res = await fetch(
+        isUpdate ? `/api/pos/suppliers/${editing.id}` : '/api/pos/suppliers',
+        {
+          method: isUpdate ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: editing.name,
+            contactName: editing.contactName || null,
+            phone: editing.phone || null,
+            email: editing.email || null,
+            address: editing.address || null,
+            notes: editing.notes || null,
+            isActive: editing.isActive ?? true,
+          }),
+        }
+      )
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       toast.success('Сохранено')
       setEditing(null)
@@ -239,6 +290,43 @@ export function SuppliersPage() {
                     {s.notes}
                   </p>
                 )}
+
+                <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-border pt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setEditing({ ...s })}
+                    disabled={rowBusyId === s.id}
+                  >
+                    <Pencil className="mr-1 h-3 w-3" />
+                    Изменить
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={s.isActive ? 'secondary' : 'default'}
+                    className="h-7 px-2 text-xs"
+                    onClick={() => toggleActive(s)}
+                    disabled={rowBusyId === s.id}
+                  >
+                    {rowBusyId === s.id ? (
+                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                    ) : (
+                      <Power className="mr-1 h-3 w-3" />
+                    )}
+                    {s.isActive ? 'Откл.' : 'Вкл.'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                    onClick={() => deleteSupplier(s)}
+                    disabled={rowBusyId === s.id}
+                  >
+                    <Trash2 className="mr-1 h-3 w-3" />
+                    Удалить
+                  </Button>
+                </div>
               </article>
             ))}
           </div>
@@ -248,7 +336,9 @@ export function SuppliersPage() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
-            <DialogTitle>Новый поставщик</DialogTitle>
+            <DialogTitle>
+              {editing?.id ? 'Редактировать поставщика' : 'Новый поставщик'}
+            </DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="grid gap-3 sm:grid-cols-2">
