@@ -122,8 +122,12 @@ export default function FinancePage() {
       setCompanyBalance(data.companyBalance ?? 0)
       setHistory(Array.isArray(data.history) ? data.history : [])
     } catch (err) {
-      console.error('finance load failed', err)
-      toast.error('Не удалось загрузить финансовые данные')
+      // Surface to user via toast; raw error stays in DevTools network panel.
+      toast.error(
+        err instanceof Error
+          ? `Ошибка загрузки: ${err.message}`
+          : 'Не удалось загрузить финансовые данные'
+      )
     }
   }, [])
 

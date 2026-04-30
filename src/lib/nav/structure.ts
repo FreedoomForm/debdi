@@ -180,7 +180,8 @@ export const NAV: NavSection[] = [
     color: 'indigo',
     children: [
       { id: 'orders-delivery', href: '/middle-admin?tab=orders', label: 'Заказы доставки', icon: Receipt, desc: 'Активные доставки' },
-      { id: 'couriers', href: '/middle-admin?tab=admins&role=COURIER', label: 'Курьеры', icon: Truck, desc: 'Список и статус' },
+      { id: 'couriers', href: '/pos/couriers', label: 'Курьеры', icon: Truck, desc: 'KPI, лайв-позиции, зарплата', badge: 'new' },
+      { id: 'couriers-legacy', href: '/middle-admin?tab=admins&role=COURIER', label: 'Курьеры (старая)', icon: Truck, desc: 'Легаси-вид' },
       { id: 'live-map', href: '/middle-admin?tab=orders&sub=map', label: 'Live-карта', icon: MapPin, desc: 'Курьеры в реальном времени', badge: 'live' },
       { id: 'route-optimize', href: '/middle-admin?tab=orders&sub=optimize', label: 'Оптимизация маршрутов', icon: TrendingUp, desc: 'ORS-планирование' },
     ],

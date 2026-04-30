@@ -1,5 +1,10 @@
 'use client'
 
+// Database admin view depends on session + URL state and is dynamic by
+// nature. Skip static prerender to avoid re-triggering useSearchParams
+// CSR-bailout build errors when child trees pull in client hooks.
+export const dynamic = 'force-dynamic'
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
