@@ -51,6 +51,7 @@ import {
   MessageSquare,
   Globe,
   CreditCard,
+  Trash2,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -236,6 +237,8 @@ export const NAV: NavSection[] = [
       { id: 'pos-settings', href: '/pos/settings', label: 'Параметры POS', icon: Cog, desc: 'Валюта, налоги, чек' },
       { id: 'printers', href: '/pos/printers', label: 'Принтеры', icon: Printer, desc: 'Касса, кухня, бар' },
       { id: 'branches', href: '/pos/branches', label: 'Филиалы', icon: Store, desc: 'Мульти-локация' },
+      { id: 'trash', href: '/pos/trash', label: 'Корзина', icon: Trash2, desc: 'Удалённые клиенты и заказы', badge: 'new' },
+      { id: 'trash-legacy', href: '/middle-admin?tab=bin', label: 'Корзина (старая)', icon: Trash2, desc: 'Легаси-вид' },
       { id: 'database', href: '/middle-admin/database', label: 'База данных', icon: Database, desc: 'Импорт / экспорт', rolesAllowed: ['SUPER_ADMIN', 'MIDDLE_ADMIN'] },
       { id: 'interface', href: '/middle-admin?tab=interface', label: 'Интерфейс', icon: Settings, desc: 'Темы, языки, доступы' },
     ],
