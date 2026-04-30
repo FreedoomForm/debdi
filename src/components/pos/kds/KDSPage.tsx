@@ -11,10 +11,8 @@
  * large touch targets, no clutter.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import { toast } from 'sonner'
 import {
-  ArrowLeft,
   ChefHat,
   Clock,
   Loader2,
@@ -28,6 +26,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { formatTime, relativeTime } from '@/lib/pos'
 
 type KdsItem = {
@@ -163,49 +162,43 @@ export function KDSPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-3rem)] flex-col bg-slate-950 text-slate-50">
-      {/* Top bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900 px-4">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="h-9 w-9 text-slate-300 hover:text-white">
-            <Link href="/pos/terminal" aria-label="К терминалу">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <ChefHat className="h-5 w-5 text-amber-400" />
-          <div>
-            <h1 className="text-base font-semibold leading-tight">
-              Kitchen Display
-            </h1>
-            <p className="text-[11px] text-slate-400">
-              Авто-обновление каждые {REFRESH_MS / 1000}с · {orders.length} активных
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => setSoundOn((v) => !v)}
-            className="text-slate-300 hover:text-white"
-          >
-            {soundOn ? (
-              <Volume2 className="h-4 w-4" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => load()}
-            className="text-slate-300 hover:text-white"
-          >
-            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-          </Button>
-        </div>
-      </header>
+      <PosPageHeader
+        title="Kitchen Display"
+        backHref="/pos/dashboard"
+        icon={<ChefHat className="h-4 w-4 text-amber-400" />}
+        badge={
+          <span className="text-[10px] text-slate-400">
+            {REFRESH_MS / 1000}с · {orders.length} активных
+          </span>
+        }
+        className="border-slate-800 bg-slate-900 text-slate-50"
+        actions={
+          <>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => setSoundOn((v) => !v)}
+              className="text-slate-300 hover:text-white"
+            >
+              {soundOn ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => load()}
+              className="text-slate-300 hover:text-white"
+            >
+              <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+            </Button>
+          </>
+        }
+      />
 
       {/* Station filter chips (Hot/Cold/Bar/Grill/Bakery/Unrouted) */}
       <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-800 bg-slate-900/60 px-4 py-2">
