@@ -152,6 +152,7 @@ export const NAV: NavSection[] = [
       { id: 'products', href: '/pos/products', label: 'Товары', icon: Package, desc: 'SKU, цены, остатки' },
       { id: 'categories', href: '/pos/categories', label: 'Категории', icon: FolderTree, desc: 'Группы товаров' },
       { id: 'inventory', href: '/pos/inventory', label: 'Движения склада', icon: Boxes, desc: 'Аудит остатков' },
+      { id: 'ingredients', href: '/pos/ingredients', label: 'Ингредиенты', icon: Boxes, desc: 'Сырьё для блюд', badge: 'new' },
       { id: 'warehouse', href: '/pos/warehouse', label: 'Склад продуктов', icon: Boxes, desc: 'Сырьё для блюд' },
       { id: 'suppliers', href: '/pos/suppliers', label: 'Поставщики', icon: Truck, desc: 'Контакты, профили' },
       { id: 'purchase-orders', href: '/pos/purchase-orders', label: 'Заказы поставщикам', icon: Truck, desc: 'PO, приёмка, статусы', badge: 'new' },
