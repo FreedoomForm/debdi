@@ -18,6 +18,7 @@ import {
   Moon,
   CircleDot,
   Trash2,
+  Pencil,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -103,6 +104,8 @@ export default function ChecklistsPage() {
 
   // Run-instance dialog
   const [runInstance, setRunInstance] = useState<Instance | null>(null)
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null)
+  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null)
   const [savingResponse, setSavingResponse] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -197,6 +200,34 @@ export default function ChecklistsPage() {
     } finally {
       setCreating(false)
     }
+  }
+
+  const deleteTemplate = async (t: Template) => {
+    const ok =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm(`Удалить шаблон «${t.name}»? Все запуски также будут удалены.`)
+    if (!ok) return
+    setRowBusyId(t.id)
+    try {
+      const res = await fetch(`/api/pos/checklists/${t.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      toast.success('Шаблон удалён')
+      await load()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось удалить'
+      )
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
+  const openEdit = (t: Template) => {
+    setEditingTemplate(t)
   }
 
   const startRun = async (templateId: string) => {
@@ -369,6 +400,33 @@ export default function ChecklistsPage() {
                           <CircleDot className="mr-1.5 h-3.5 w-3.5" />
                           Запустить
                         </Button>
+
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 h-7 text-xs"
+                            onClick={() => openEdit(t)}
+                            disabled={rowBusyId === t.id}
+                          >
+                            <Pencil className="mr-1 h-3 w-3" />
+                            Изменить
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 text-xs text-rose-600 hover:bg-rose-50"
+                            onClick={() => deleteTemplate(t)}
+                            disabled={rowBusyId === t.id}
+                            aria-label="Удалить"
+                          >
+                            {rowBusyId === t.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   )
