@@ -195,6 +195,7 @@ export const NAV: NavSection[] = [
       { id: 'cash-drawer', href: '/pos/cash-drawer', label: 'Кассовый ящик', icon: CreditCard, desc: 'Внесения и изъятия', badge: 'new' },
       { id: 'tip-pool', href: '/pos/tip-pool', label: 'Tip Pool', icon: Wallet, desc: 'Распределение чаевых', badge: 'new' },
       { id: 'tax-rates', href: '/pos/settings?focus=tax', label: 'Ставки налогов', icon: Percent, desc: 'НДС и сервисный сбор' },
+      { id: 'payments', href: '/pos/payments', label: 'Платежи', icon: CreditCard, desc: 'Транзакции, методы, возвраты', badge: 'new' },
       { id: 'reports-fin', href: '/pos/reports', label: 'Финансовые отчёты', icon: BarChart3, desc: 'Прибыль/убыток' },
     ],
   },
