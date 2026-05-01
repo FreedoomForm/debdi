@@ -52,6 +52,8 @@ import { cn } from '@/lib/utils'
 import { KpiTile } from '@/components/pos/shared/KpiTile'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { RefreshButton } from '@/components/pos/shared/RefreshButton'
+import { EntityStatusBadge } from '@/components/admin/dashboard/shared/EntityStatusBadge'
+import { FilterToolbar } from '@/components/admin/dashboard/shared/FilterToolbar'
 
 type Client = {
   id: string
@@ -253,16 +255,11 @@ export default function ClientsPage() {
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Поиск по имени, телефону, адресу…"
-            className="pl-8"
-          />
-        </div>
+      <FilterToolbar
+        searchValue={search}
+        searchPlaceholder="Поиск по имени, телефону, адресу…"
+        onSearchChange={setSearch}
+      >
         <Select value={segment} onValueChange={(v) => setSegment(v as typeof segment)}>
           <SelectTrigger className="w-[200px]">
             <Filter className="mr-1 h-3.5 w-3.5" />
@@ -277,7 +274,7 @@ export default function ClientsPage() {
             <SelectItem value="top">Топ-50 по обороту</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </FilterToolbar>
 
       <Card>
         <CardContent className="p-0">
@@ -346,15 +343,12 @@ export default function ClientsPage() {
                       {formatCurrency(c.balance ?? 0, 'UZS')}
                     </TableCell>
                     <TableCell>
-                      {c.isActive === false ? (
-                        <Badge variant="secondary" className="bg-slate-100 text-slate-700">
-                          Неактивен
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">
-                          Активен
-                        </Badge>
-                      )}
+                      <EntityStatusBadge
+                        isActive={c.isActive !== false}
+                        activeLabel="Активен"
+                        inactiveLabel="Неактивен"
+                        showDot
+                      />
                     </TableCell>
                   </TableRow>
                 ))

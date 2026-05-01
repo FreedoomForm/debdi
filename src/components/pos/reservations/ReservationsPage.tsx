@@ -55,7 +55,9 @@ import {
 import { cn } from '@/lib/utils'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { RefreshButton } from '@/components/pos/shared/RefreshButton'
+import { PosDateSelector } from '@/components/pos/shared/PosDateSelector'
 import { formatTime, type PosTable } from '@/lib/pos'
+import type { DateRange } from 'react-day-picker'
 
 type Reservation = {
   id: string
@@ -100,9 +102,11 @@ const EMPTY_FORM = {
 export function ReservationsPage() {
   const [items, setItems] = useState<Reservation[]>([])
   const [tables, setTables] = useState<PosTable[]>([])
-  const [date, setDate] = useState<string>(() =>
-    new Date().toISOString().slice(0, 10)
-  )
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return { from: today, to: today }
+  })
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState({ ...EMPTY_FORM })
@@ -111,8 +115,11 @@ export function ReservationsPage() {
 
   const load = useCallback(async () => {
     try {
-      const from = new Date(date + 'T00:00:00')
-      const to = new Date(date + 'T23:59:59')
+      const selectedDate = dateRange?.from ?? new Date()
+      selectedDate.setHours(0, 0, 0, 0)
+      const from = new Date(selectedDate)
+      const to = new Date(selectedDate)
+      to.setHours(23, 59, 59, 999)
       const [resRes, tblRes] = await Promise.all([
         fetch(
           `/api/pos/reservations?from=${from.toISOString()}&to=${to.toISOString()}`,
@@ -131,7 +138,7 @@ export function ReservationsPage() {
     } finally {
       setLoading(false)
     }
-  }, [date])
+  }, [dateRange])
 
   useEffect(() => {
     load()
@@ -236,11 +243,10 @@ export function ReservationsPage() {
         badge={sortedItems.length}
         actions={
           <>
-            <Input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="h-9 w-[160px]"
+            <PosDateSelector
+              value={dateRange}
+              onChange={setDateRange}
+              compact
             />
             <RefreshButton onClick={load} loading={loading} />
             <Button
