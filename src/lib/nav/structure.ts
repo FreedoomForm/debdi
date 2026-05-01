@@ -198,6 +198,7 @@ export const NAV: NavSection[] = [
       { id: 'finance', href: '/pos/finance', label: 'Финансы', icon: Wallet, desc: 'KPI, фильтры, экспорт' },
       { id: 'cash-drawer', href: '/pos/cash-drawer', label: 'Кассовый ящик', icon: CreditCard, desc: 'Внесения и изъятия', badge: 'new' },
       { id: 'payments', href: '/pos/payments', label: 'Платежи', icon: CreditCard, desc: 'Транзакции, возвраты', badge: 'new' },
+      { id: 'refunds', href: '/pos/refunds', label: 'Возвраты', icon: CreditCard, desc: 'Аудит возвратов', badge: 'new' },
       { id: 'tip-pool', href: '/pos/tip-pool', label: 'Tip Pool', icon: Wallet, desc: 'Распределение чаевых', badge: 'new' },
       { id: 'tax-rates', href: '/pos/settings?focus=tax', label: 'Ставки налогов', icon: Percent, desc: 'НДС и сервисный сбор' },
       { id: 'payments', href: '/pos/payments', label: 'Платежи', icon: CreditCard, desc: 'Транзакции, методы, возвраты', badge: 'new' },
