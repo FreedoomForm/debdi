@@ -30,6 +30,10 @@ if (!process.env.DATABASE_URL) {
   log('[vercel-db-push] Skipping: DATABASE_URL is not set.')
   process.exit(0)
 }
+if (!process.env.DIRECT_URL) {
+  log('[vercel-db-push] Warning: DIRECT_URL is not set. This may cause connection issues with Neon.')
+  log('[vercel-db-push] For Neon databases, set DIRECT_URL to the non-pooler connection string.')
+}
 
 log('[vercel-db-push] Running: prisma db push --skip-generate')
 const first = runPrismaPush(['--skip-generate'])
