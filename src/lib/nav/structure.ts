@@ -104,6 +104,7 @@ export const NAV: NavSection[] = [
     children: [
       { id: 'terminal', href: '/pos/terminal', label: 'Терминал', icon: ShoppingCart, desc: 'Кассовый интерфейс' },
       { id: 'orders', href: '/pos/orders', label: 'Журнал заказов', icon: Receipt, desc: 'История + возвраты' },
+      { id: 'receipts', href: '/pos/receipts', label: 'Чеки', icon: Receipt, desc: 'Печать и отправка', badge: 'new' },
       { id: 'shift', href: '/pos/shift', label: 'Смена', icon: Clock, desc: 'Открыть / закрыть кассу' },
       { id: 'customer-display', href: '/pos/customer-display', label: 'Экран клиента', icon: Monitor, desc: 'Второй экран' },
       { id: 'discounts', href: '/pos/discounts', label: 'Скидки и промо', icon: Percent, desc: 'Купоны, акции' },
