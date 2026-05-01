@@ -121,7 +121,7 @@ export const NAV: NavSection[] = [
     color: 'rose',
     children: [
       { id: 'kds', href: '/pos/kds', label: 'KDS · Дисплей', icon: ChefHat, desc: 'Активные тикеты' },
-      { id: 'cooking-plan', href: '/pos/warehouse?tab=cooking', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд' },
+      { id: 'cooking-plan', href: '/pos/cooking-plan', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд', badge: 'new' },
       { id: 'menu-sets', href: '/pos/warehouse?tab=sets', label: 'Меню-сеты', icon: Layers, desc: 'Калорийные группы' },
       { id: 'dishes', href: '/pos/dishes', label: 'Блюда', icon: Utensils, desc: 'Рецепты, ингредиенты', badge: 'new' },
       { id: 'menus', href: '/pos/menus', label: 'Меню (21 день)', icon: CalendarDays, desc: 'Циклическое меню', badge: 'new' },
