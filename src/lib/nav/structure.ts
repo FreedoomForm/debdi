@@ -51,6 +51,7 @@ import {
   Trash2,
   ClipboardCheck,
   Bell,
+  Repeat,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -104,6 +105,7 @@ export const NAV: NavSection[] = [
     children: [
       { id: 'terminal', href: '/pos/terminal', label: 'Терминал', icon: ShoppingCart, desc: 'Кассовый интерфейс' },
       { id: 'orders', href: '/pos/orders', label: 'Журнал заказов', icon: Receipt, desc: 'История + возвраты' },
+      { id: 'auto-orders', href: '/pos/auto-orders', label: 'Авто-заказы', icon: Repeat, desc: 'Расписание на 30 дней', badge: 'new' },
       { id: 'receipts', href: '/pos/receipts', label: 'Чеки', icon: Receipt, desc: 'Печать и отправка', badge: 'new' },
       { id: 'shift', href: '/pos/shift', label: 'Смена', icon: Clock, desc: 'Открыть / закрыть кассу' },
       { id: 'customer-display', href: '/pos/customer-display', label: 'Экран клиента', icon: Monitor, desc: 'Второй экран' },
