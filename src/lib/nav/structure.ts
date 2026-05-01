@@ -50,6 +50,7 @@ import {
   CreditCard,
   Trash2,
   ClipboardCheck,
+  Bell,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -87,6 +88,7 @@ export const NAV: NavSection[] = [
       { id: 'statistics', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории' },
       { id: 'reports', href: '/pos/reports', label: 'Отчёты продаж', icon: BarChart3, desc: 'Выручка, чеки, тренды' },
       { id: 'history', href: '/pos/history', label: 'Журнал действий', icon: History, desc: 'Аудит-лог, фильтры' },
+      { id: 'notifications', href: '/pos/notifications', label: 'Уведомления', icon: Bell, desc: 'Inbox событий', badge: 'new' },
     ],
   },
   // ─── 2. Sales / POS Terminal ────────────────────────────────────────────
