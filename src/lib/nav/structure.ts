@@ -149,7 +149,8 @@ export const NAV: NavSection[] = [
       { id: 'categories', href: '/pos/categories', label: 'Категории', icon: FolderTree, desc: 'Группы товаров' },
       { id: 'inventory', href: '/pos/inventory', label: 'Движения склада', icon: Boxes, desc: 'Аудит остатков' },
       { id: 'warehouse', href: '/pos/warehouse', label: 'Склад продуктов', icon: Boxes, desc: 'Сырьё для блюд' },
-      { id: 'suppliers', href: '/pos/suppliers', label: 'Поставщики и закупки', icon: Truck, desc: 'Контакты, PO' },
+      { id: 'suppliers', href: '/pos/suppliers', label: 'Поставщики', icon: Truck, desc: 'Контакты, профили' },
+      { id: 'purchase-orders', href: '/pos/purchase-orders', label: 'Заказы поставщикам', icon: Truck, desc: 'PO, приёмка, статусы', badge: 'new' },
     ],
   },
   // ─── 6. CRM / Customers / Loyalty ───────────────────────────────────────
