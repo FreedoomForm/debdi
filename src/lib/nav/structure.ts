@@ -188,6 +188,7 @@ export const NAV: NavSection[] = [
       { id: 'orders-delivery', href: '/pos/delivery', label: 'Заказы доставки', icon: Receipt, desc: 'KPI, статус-пиплайн' },
       { id: 'couriers', href: '/pos/couriers', label: 'Курьеры', icon: Truck, desc: 'KPI, лайв-позиции, зарплата' },
       { id: 'live-map', href: '/pos/delivery/map', label: 'Live-карта', icon: MapPin, desc: 'Курьеры в реальном времени', badge: 'live' },
+      { id: 'dispatch', href: '/pos/dispatch', label: 'Диспетчер', icon: Truck, desc: 'Запуск дня и нормализация', badge: 'new' },
     ],
   },
   // ─── 8. Finance / Cash / Salary ─────────────────────────────────────────
