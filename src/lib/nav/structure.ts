@@ -87,6 +87,7 @@ export const NAV: NavSection[] = [
       { id: 'live-status', href: '/pos/dashboard?focus=live', label: 'Лайв-статус', icon: TrendingUp, desc: 'Что происходит сейчас', badge: 'live' },
       { id: 'statistics', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории' },
       { id: 'reports', href: '/pos/reports', label: 'Отчёты продаж', icon: BarChart3, desc: 'Выручка, чеки, тренды' },
+      { id: 'forecast', href: '/pos/forecast', label: 'Прогноз спроса', icon: TrendingUp, desc: 'AI-прогноз выручки и SKU', badge: 'new' },
       { id: 'history', href: '/pos/history', label: 'Журнал действий', icon: History, desc: 'Аудит-лог, фильтры' },
       { id: 'notifications', href: '/pos/notifications', label: 'Уведомления', icon: Bell, desc: 'Inbox событий', badge: 'new' },
     ],
