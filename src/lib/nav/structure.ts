@@ -84,7 +84,7 @@ export const NAV: NavSection[] = [
     color: 'amber',
     children: [
       { id: 'overview', href: '/pos/dashboard', label: 'Дашборд', icon: LayoutDashboard, desc: 'Общая сводка дня' },
-      { id: 'live-status', href: '/pos/dashboard?focus=live', label: 'Лайв-статус', icon: TrendingUp, desc: 'Что происходит сейчас', badge: 'live' },
+      { id: 'live-status', href: '/pos/live', label: 'Лайв-статус', icon: TrendingUp, desc: 'Что происходит сейчас', badge: 'live' },
       { id: 'statistics', href: '/pos/statistics', label: 'Статистика', icon: BarChart3, desc: 'KPI, статусы, калории' },
       { id: 'reports', href: '/pos/reports', label: 'Отчёты продаж', icon: BarChart3, desc: 'Выручка, чеки, тренды' },
       { id: 'forecast', href: '/pos/forecast', label: 'AI-прогноз спроса', icon: TrendingUp, desc: 'Холт-Винтерс + EWMA', badge: 'new' },
