@@ -123,6 +123,7 @@ export const NAV: NavSection[] = [
       { id: 'cooking-plan', href: '/pos/warehouse?tab=cooking', label: 'План готовки', icon: ChefHat, desc: 'Дневной план блюд' },
       { id: 'menu-sets', href: '/pos/warehouse?tab=sets', label: 'Меню-сеты', icon: Layers, desc: 'Калорийные группы' },
       { id: 'dishes', href: '/pos/warehouse?tab=dishes', label: 'Блюда', icon: Utensils, desc: 'Рецепты, ингредиенты' },
+      { id: 'menus', href: '/pos/menus', label: 'Меню (21 день)', icon: CalendarDays, desc: 'Циклическое меню', badge: 'new' },
     ],
   },
   // ─── 4. Tables / Reservations / Floor ───────────────────────────────────
@@ -165,6 +166,7 @@ export const NAV: NavSection[] = [
     color: 'cyan',
     children: [
       { id: 'clients', href: '/pos/clients', label: 'База клиентов', icon: Users, desc: 'CRM, KPI, фильтры' },
+      { id: 'customer-lookup', href: '/pos/customer-lookup', label: 'Поиск клиентов', icon: Users, desc: 'Быстрый lookup', badge: 'new' },
       { id: 'loyalty', href: '/pos/loyalty', label: 'Лояльность', icon: Award, desc: 'Баллы и уровни' },
       { id: 'chat', href: '/pos/chat', label: 'Чат', icon: MessageSquare, desc: 'Двухпанельный мессенджер' },
       { id: 'sites', href: '/pos/sites', label: 'Сайт-витрина', icon: Globe, desc: 'Поддомен, тема, контент' },
