@@ -16,6 +16,9 @@ import {
   Boxes,
   Loader2,
   Search,
+  Package,
+  Plus,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +28,73 @@ import { cn } from '@/lib/utils'
 import { formatDateTime } from '@/lib/pos'
 import { PosPageHeader } from '@/components/pos/shared/PosPageHeader'
 import { RefreshButton } from '@/components/pos/shared/RefreshButton'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { KpiTile } from '@/components/pos/shared/KpiTile'
+
+type Product = {
+  id: string
+  name: string
+  sku?: string | null
+  unit: string
+  stockOnHand: number
+  trackStock: boolean
+}
+
+type CreateType = 'PURCHASE' | 'ADJUSTMENT' | 'RETURN' | 'WASTE' | 'TRANSFER'
+
+const CREATE_TYPE_OPTIONS: Array<{
+  value: CreateType
+  label: string
+  hint: string
+  defaultSign: 'positive' | 'negative'
+}> = [
+  {
+    value: 'PURCHASE',
+    label: 'Закупка',
+    hint: 'Поступление от поставщика',
+    defaultSign: 'positive',
+  },
+  {
+    value: 'RETURN',
+    label: 'Возврат',
+    hint: 'Возврат от клиента (плюс)',
+    defaultSign: 'positive',
+  },
+  {
+    value: 'ADJUSTMENT',
+    label: 'Коррекция',
+    hint: 'Ручная корректировка (±)',
+    defaultSign: 'positive',
+  },
+  {
+    value: 'WASTE',
+    label: 'Списание',
+    hint: 'Брак / порча (минус)',
+    defaultSign: 'negative',
+  },
+  {
+    value: 'TRANSFER',
+    label: 'Перевод',
+    hint: 'Между филиалами (±)',
+    defaultSign: 'negative',
+  },
+]
 
 type Movement = {
   id: string
@@ -63,17 +133,44 @@ const TYPE_LABELS: Record<Movement['type'], { label: string; tone: string }> = {
 
 export function InventoryPage() {
   const [movements, setMovements] = useState<Movement[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
 
+  // Create movement dialog state
+  const [createOpen, setCreateOpen] = useState(false)
+  const [form, setForm] = useState<{
+    productId: string
+    type: CreateType
+    quantity: string
+    sign: 'positive' | 'negative'
+    reason: string
+    reference: string
+  }>({
+    productId: '',
+    type: 'PURCHASE',
+    quantity: '',
+    sign: 'positive',
+    reason: '',
+    reference: '',
+  })
+  const [busy, setBusy] = useState(false)
+
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/pos/inventory/movements?limit=300', {
-        credentials: 'include',
-      })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = (await res.json()) as { items?: Movement[] }
-      setMovements(data.items ?? [])
+      const [movRes, prodRes] = await Promise.all([
+        fetch('/api/pos/inventory/movements?limit=300', {
+          credentials: 'include',
+        }),
+        fetch('/api/pos/products?active=0', { credentials: 'include' }),
+      ])
+      if (!movRes.ok) throw new Error(`HTTP ${movRes.status}`)
+      const movData = (await movRes.json()) as { items?: Movement[] }
+      setMovements(movData.items ?? [])
+      if (prodRes.ok) {
+        const prodData = (await prodRes.json()) as { items?: Product[] }
+        setProducts(prodData.items ?? [])
+      }
     } catch (err) {
       toast.error(
         err instanceof Error ? `Ошибка: ${err.message}` : 'Не удалось загрузить'
@@ -82,6 +179,68 @@ export function InventoryPage() {
       setLoading(false)
     }
   }, [])
+
+  const submit = async () => {
+    if (!form.productId) {
+      toast.error('Выберите товар')
+      return
+    }
+    const qty = Number(form.quantity)
+    if (!Number.isFinite(qty) || qty <= 0) {
+      toast.error('Укажите количество > 0')
+      return
+    }
+    const signed = form.sign === 'negative' ? -Math.abs(qty) : Math.abs(qty)
+    setBusy(true)
+    try {
+      const res = await fetch('/api/pos/inventory/movements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          productId: form.productId,
+          type: form.type,
+          quantity: signed,
+          reason: form.reason.trim() || undefined,
+          reference: form.reference.trim() || undefined,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? `HTTP ${res.status}`)
+      }
+      toast.success('Движение зафиксировано')
+      setCreateOpen(false)
+      setForm({
+        productId: '',
+        type: 'PURCHASE',
+        quantity: '',
+        sign: 'positive',
+        reason: '',
+        reference: '',
+      })
+      await load()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Не удалось')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  // Stats: counts of in/out/waste over the loaded movements window.
+  const stats = useMemo(() => {
+    let incoming = 0
+    let outgoing = 0
+    let wasteCount = 0
+    let adjCount = 0
+    for (const m of movements) {
+      if (m.quantity > 0) incoming += m.quantity
+      else outgoing += Math.abs(m.quantity)
+      if (m.type === 'WASTE') wasteCount += 1
+      if (m.type === 'ADJUSTMENT') adjCount += 1
+    }
+    return { incoming, outgoing, wasteCount, adjCount }
+  }, [movements])
 
   useEffect(() => {
     load()
@@ -117,11 +276,45 @@ export function InventoryPage() {
               />
             </div>
             <RefreshButton onClick={load} loading={loading} />
+            <Button size="sm" onClick={() => setCreateOpen(true)} disabled={products.length === 0}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Движение
+            </Button>
           </>
         }
       />
 
-      <main className="px-3 py-3">
+      <main className="space-y-3 px-3 py-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <KpiTile
+            label="Приход"
+            value={String(Math.round(stats.incoming))}
+            icon={<ArrowUp className="h-4 w-4" />}
+            tone="emerald"
+            hint="Сумма + по всем движениям"
+          />
+          <KpiTile
+            label="Расход"
+            value={String(Math.round(stats.outgoing))}
+            icon={<ArrowDown className="h-4 w-4" />}
+            tone={stats.outgoing > 0 ? 'rose' : 'neutral'}
+            hint="Сумма − по всем движениям"
+          />
+          <KpiTile
+            label="Списания"
+            value={String(stats.wasteCount)}
+            icon={<Trash2 className="h-4 w-4" />}
+            tone={stats.wasteCount > 0 ? 'amber' : 'neutral'}
+            hint="Кол-во записей WASTE"
+          />
+          <KpiTile
+            label="Коррекции"
+            value={String(stats.adjCount)}
+            icon={<Package className="h-4 w-4" />}
+            tone="violet"
+            hint="Кол-во записей ADJUSTMENT"
+          />
+        </div>
         {loading ? (
           <div className="grid place-items-center py-20">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -200,6 +393,135 @@ export function InventoryPage() {
           </div>
         )}
       </main>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Новое движение склада</DialogTitle>
+            <DialogDescription>
+              Закупка / возврат / коррекция / списание / перевод. Авто-86 и
+              авто-разблокировка товара выполняются на сервере.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Товар*</Label>
+              <Select
+                value={form.productId}
+                onValueChange={(v) =>
+                  setForm((p) => ({ ...p, productId: v }))
+                }
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Выберите товар" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                      {p.sku ? ` · ${p.sku}` : ''}
+                      {' · '}
+                      {p.stockOnHand} {p.unit}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Тип</Label>
+              <Select
+                value={form.type}
+                onValueChange={(v) => {
+                  const opt = CREATE_TYPE_OPTIONS.find((o) => o.value === v) ?? null
+                  setForm((p) => ({
+                    ...p,
+                    type: v as CreateType,
+                    sign: opt?.defaultSign ?? p.sign,
+                  }))
+                }}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CREATE_TYPE_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>
+                      {o.label} — {o.hint}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Направление</Label>
+              <Select
+                value={form.sign}
+                onValueChange={(v) =>
+                  setForm((p) => ({ ...p, sign: v as 'positive' | 'negative' }))
+                }
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="positive">+ Приход</SelectItem>
+                  <SelectItem value="negative">− Расход</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Количество*</Label>
+              <Input
+                type="number"
+                inputMode="decimal"
+                value={form.quantity}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, quantity: e.target.value }))
+                }
+                placeholder="0"
+                className="mt-1"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Причина</Label>
+              <Textarea
+                value={form.reason}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, reason: e.target.value }))
+                }
+                placeholder="Например: ежедневная закупка, списание брака, коррекция инвентаризации"
+                className="mt-1 min-h-[64px]"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Референс</Label>
+              <Input
+                value={form.reference}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, reference: e.target.value }))
+                }
+                placeholder="№ накладной, ID перевода и т.п."
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>
+              Отмена
+            </Button>
+            <Button onClick={submit} disabled={busy}>
+              {busy ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-1 h-4 w-4" />
+              )}
+              Сохранить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
